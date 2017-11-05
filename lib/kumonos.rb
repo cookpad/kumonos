@@ -2,6 +2,7 @@ require 'json'
 require 'yaml'
 require 'kumonos/version'
 
+# Kumonos
 module Kumonos
   class << self
     def generate(config)
