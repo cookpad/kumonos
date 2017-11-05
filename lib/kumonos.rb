@@ -1,5 +1,4 @@
-require "kumonos/version"
+require 'kumonos/version'
 
 module Kumonos
-  # Your code goes here...
 end
