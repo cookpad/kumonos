@@ -9,4 +9,6 @@
 
 # rspec failure tracking
 .rspec_status
+
 Gemfile.lock
+test/config.json

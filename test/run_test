@@ -1,0 +1,7 @@
+#!/bin/bash
+set -ex
+
+../exe/kumonos ../example/book.yml > config.json
+docker-compose up --build -d
+ruby test.rb
+docker-compose down
