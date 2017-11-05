@@ -5,8 +5,8 @@ require 'kumonos/version'
 module Kumonos
   class << self
     def generate(config)
-      virtual_hosts = config['services'].map {|s| service_to_vhost(s) }
-      clusters = config['services'].map {|s| service_to_cluster(s) }
+      virtual_hosts = config['services'].map { |s| service_to_vhost(s) }
+      clusters = config['services'].map { |s| service_to_cluster(s) }
       {
         listeners: [
           {
@@ -19,11 +19,11 @@ module Kumonos
                 stat_prefix: 'ingress_http',
                 access_log: [{ path: '/dev/stdout' }],
                 route_config: {
-                  virtual_hosts: virtual_hosts,
+                  virtual_hosts: virtual_hosts
                 },
-                filters: [{ type: 'decoder', name: 'router', config: {} }],
+                filters: [{ type: 'decoder', name: 'router', config: {} }]
               }
-            ],
+            ]
           }
         ],
         admin: {
@@ -31,7 +31,7 @@ module Kumonos
           address: 'tcp://0.0.0.0:9901'
         },
         cluster_manager: {
-          clusters: clusters,
+          clusters: clusters
         }
       }
     end
@@ -44,7 +44,7 @@ module Kumonos
       {
         name: name,
         domains: [name],
-        routes: service['routes'].flat_map {|r| split_route(r, name) }
+        routes: service['routes'].flat_map { |r| split_route(r, name) }
       }
     end
 
@@ -53,11 +53,11 @@ module Kumonos
       base = {
         prefix: route['prefix'],
         timeout_ms: route['timeout_ms'],
-        cluster: name,
+        cluster: name
       }
       with_retry = base.merge(
         retry_policy: route['retry_policy'],
-        headers: [{ name: ':method', value: '(GET|HEAD)', regex: true }],
+        headers: [{ name: ':method', value: '(GET|HEAD)', regex: true }]
       )
       [with_retry, base]
     end
@@ -68,7 +68,7 @@ module Kumonos
         connect_timeout_ms: service['connect_timeout_ms'],
         type: 'logical_dns',
         lb_type: 'round_robin',
-        hosts: [ { url: "tcp://#{service['lb']}" }],
+        hosts: [{ url: "tcp://#{service['lb']}" }]
       }
       out.merge(circuit_breakers: [default: service['circuit_breaker']]) if service['circuit_breaker']
       out

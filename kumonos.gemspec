@@ -8,7 +8,7 @@ Gem::Specification.new do |spec|
   spec.authors       = ['Taiki Ono']
   spec.email         = ['taiks.4559@gmail.com']
 
-  spec.summary       = %q{Manage configuration for Service Mesh.}
+  spec.summary       = 'Manage configuration for Service Mesh.'
   spec.description   = spec.summary
   spec.homepage      = 'https://github.com/taiki45/kumonos'
   spec.license       = 'MIT'

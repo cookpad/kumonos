@@ -1,7 +1,7 @@
 require 'net/http'
 require 'uri'
 
-def raise_error(response)
+def raise_error(_response)
   raise('invalid response')
 end
 
