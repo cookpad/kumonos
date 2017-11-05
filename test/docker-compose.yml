@@ -1,39 +1,39 @@
 version: '3'
 services:
   user:
-    build: app
+    build: 'app'
     environment:
       RESPONSE: 'user'
       SLEEP: 0
       ERROR_RATE: 5
     expose:
-      - "8080"
+      - '8080'
   ab-testing:
-    build: app
+    build: 'app'
     environment:
       RESPONSE: 'ab-testing'
       SLEEP: 0
       ERROR_RATE: 5
     expose:
-      - "8080"
+      - '8080'
   envoy:
-    image: lyft/envoy
+    image: 'lyft/envoy'
     depends_on:
-      - user
-      - ab-testing
+      - 'user'
+      - 'ab-testing'
     command:
-      - "envoy"
-      - "-c"
-      - "/config.json"
-      - "--service-cluster"
-      - "book"
-      - "--service-node"
-      - "book"
+      - 'envoy'
+      - '-c'
+      - '/config.json'
+      - '--service-cluster'
+      - 'book'
+      - '--service-node'
+      - 'book'
     volumes:
-      - ./config.json:/config.json
+      - './config.json:/config.json'
     expose:
-      - "9211" # service port
-      - "9901" # admin port
+      - '9211' # service port
+      - '9901' # admin port
     ports:
-      - "9211:9211"
-      - "9901:9901"
+      - '9211:9211'
+      - '9901:9901'
