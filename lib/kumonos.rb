@@ -27,8 +27,8 @@ module Kumonos
           }
         ],
         admin: {
-          access_log_path: "/dev/stdout",
-          address: "tcp://0.0.0.0:9901"
+          access_log_path: '/dev/stdout',
+          address: 'tcp://0.0.0.0:9901'
         },
         cluster_manager: {
           clusters: clusters,
