@@ -64,15 +64,16 @@ module Kumonos
     end
 
     def service_to_cluster(service)
-      out = {
+      {
         name: service['name'],
         connect_timeout_ms: service['connect_timeout_ms'],
         type: 'logical_dns',
         lb_type: 'round_robin',
-        hosts: [{ url: "tcp://#{service['lb']}" }]
+        hosts: [{ url: "tcp://#{service['lb']}" }],
+        circuit_breakers: {
+          default: service['circuit_breaker']
+        }
       }
-      out.merge(circuit_breakers: [default: service['circuit_breaker']]) if service['circuit_breaker']
-      out
     end
   end
 end

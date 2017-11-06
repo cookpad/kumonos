@@ -19,6 +19,10 @@ services:
   - name: 'ab-testing'
     lb: 'ab-testing:8080'
     connect_timeout_ms: 250
+    circuit_breaker:
+      max_connections: 64
+      max_pending_requests: 128
+      max_retries: 3
     routes:
       - prefix: '/'
         timeout_ms: 3000

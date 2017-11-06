@@ -103,14 +103,28 @@ RSpec.describe Kumonos do
             connect_timeout_ms: 250,
             type: 'logical_dns',
             lb_type: 'round_robin',
-            hosts: [{ url: 'tcp://user:8080' }]
+            hosts: [{ url: 'tcp://user:8080' }],
+            circuit_breakers: [
+              default: {
+                max_connections: 64,
+                max_pending_requests: 128,
+                max_retries: 3
+              }
+            ]
           },
           {
             name: 'ab-testing',
             connect_timeout_ms: 250,
             type: 'logical_dns',
             lb_type: 'round_robin',
-            hosts: [{ url: 'tcp://ab-testing:8080' }]
+            hosts: [{ url: 'tcp://ab-testing:8080' }],
+            circuit_breakers: {
+              default: {
+                max_connections: 64,
+                max_pending_requests: 128,
+                max_retries: 3
+              }
+            }
           }
         ]
       }
