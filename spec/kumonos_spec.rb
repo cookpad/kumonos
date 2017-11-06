@@ -15,7 +15,7 @@ RSpec.describe Kumonos do
   end
 
   it 'generates vaild config' do
-    out = JSON.dump(Kumonos.generate(config, 'test'))
+    out = JSON.dump(Kumonos.generate(config))
     expect(out).to be_json_as(
       listeners: [
         {
@@ -30,7 +30,7 @@ RSpec.describe Kumonos do
                 access_log: [{ path: '/dev/stdout' }],
                 rds: {
                   cluster: 'nginx',
-                  route_config_name: 'test',
+                  route_config_name: 'default',
                   refresh_delay_ms: 30_000
                 },
                 filters: [

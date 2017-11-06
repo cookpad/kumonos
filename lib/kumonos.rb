@@ -7,8 +7,10 @@ require 'kumonos/configuration'
 
 # Kumonos
 module Kumonos
+  DEFAULT_ROUTE_NAME = 'default'.freeze
+
   class << self
-    def generate(config, name)
+    def generate(config)
       {
         listeners: [
           {
@@ -22,7 +24,7 @@ module Kumonos
                 access_log: [{ path: config.listener.fetch(:access_log_path) }],
                 rds: {
                   cluster: config.ds.fetch(:name),
-                  route_config_name: name,
+                  route_config_name: DEFAULT_ROUTE_NAME,
                   refresh_delay_ms: config.ds.fetch(:refresh_delay_ms)
                 },
                 filters: [{ type: 'decoder', name: 'router', config: {} }]

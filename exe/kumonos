@@ -9,9 +9,13 @@ require 'thor'
 
 # KumonosCli
 class KumonosCli < Thor
-  desc 'envoy SERVIVE_NAME', 'Generate envoy configuration'
+  def self.exit_on_failure?
+    true
+  end
+
+  desc 'envoy', 'Generate envoy configuration'
   method_option :config, aliases: '-c', desc: 'Configuration file for kumonos'
-  def envoy(service_name)
+  def envoy
     h = JSON.parse(File.read(options[:config]))
     result = Kumonos::Schemas.validate_kumonos_config(h)
     unless result.empty?
@@ -22,7 +26,7 @@ class KumonosCli < Thor
     end
 
     config = Kumonos::Configuration.from_hash(h)
-    puts JSON.dump(Kumonos.generate(config, service_name))
+    puts JSON.dump(Kumonos.generate(config))
   end
 
   desc 'clusters FILEPATH OUT', 'Generate clusters configuration'
@@ -47,7 +51,7 @@ class KumonosCli < Thor
     out = JSON.dump(Kumonos.generate_routes(definition))
 
     output_dir = Pathname.new(output_dir)
-    target = output_dir.join('v1', 'routes', name, name, name)
+    target = output_dir.join('v1', 'routes', Kumonos::DEFAULT_ROUTE_NAME, name, name)
     target.parent.mkpath unless target.parent.exist?
     target.write(out)
     puts target
