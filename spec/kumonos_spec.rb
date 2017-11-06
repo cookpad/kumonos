@@ -62,15 +62,15 @@ RSpec.describe Kumonos do
         ],
         cds: {
           cluster: {
-            name: 'nginx', # TODO
+            name: 'nginx',
             type: 'strict_dns',
             connect_timeout_ms: 250,
             lb_type: 'round_robin',
             hosts: [
-              { url: 'tcp://nginx:80' } # TODO
+              { url: 'tcp://nginx:80' }
             ]
           },
-          refresh_delay_ms: 30_000 # TODO
+          refresh_delay_ms: 30_000
         }
       }
     )
