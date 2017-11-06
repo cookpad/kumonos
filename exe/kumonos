@@ -16,7 +16,8 @@ class KumonosCli < Thor
   desc 'envoy', 'Generate envoy configuration'
   method_option :config, aliases: '-c', desc: 'Configuration file for kumonos', required: true, type: :string
   def envoy
-    h = JSON.parse(File.read(options[:config]))
+    validate_path!(options.fetch(:config))
+    h = JSON.parse(File.read(options.fetch(:config)))
     result = Kumonos::Schemas.validate_kumonos_config(h)
     unless result.empty?
       warn("#{options[:config]} has invalid format:")
@@ -32,12 +33,15 @@ class KumonosCli < Thor
   desc 'clusters SERVIVE_DEFINITION_PATH', 'Generate clusters configuration'
   method_option :output, aliases: '-o', desc: 'Output directory', required: true, type: :string
   def clusters(filepath)
-    name = File.basename(filepath, '.*')
-    definition = YAML.load_file(filepath)
-    validate_service_definition!(definition, filepath)
+    validate_path!(filepath)
+    validate_path!(options.fetch(:output))
 
-    output_dir = Pathname.new(options[:output])
+    definition = YAML.load_file(filepath)
+    name = File.basename(filepath, '.*')
+    validate_service_definition!(definition, filepath)
     out = JSON.dump(Kumonos::Clusters.generate(definition))
+
+    output_dir = Pathname.new(options.fetch(:output))
     target = output_dir.join('v1', 'clusters', name, name)
     target.parent.mkpath unless target.parent.exist?
     target.write(out)
@@ -47,12 +51,15 @@ class KumonosCli < Thor
   desc 'routes SERVIVE_DEFINITION_PATH', 'Generate routes configuration'
   method_option :output, aliases: '-o', desc: 'Output directory', required: true, type: :string
   def routes(filepath)
-    name = File.basename(filepath, '.*')
+    validate_path!(filepath)
+    validate_path!(options.fetch(:output))
+
     definition = YAML.load_file(filepath)
+    name = File.basename(filepath, '.*')
     validate_service_definition!(definition, filepath)
     out = JSON.dump(Kumonos::Routes.generate(definition))
 
-    output_dir = Pathname.new(options[:output])
+    output_dir = Pathname.new(options.fetch(:output))
     target = output_dir.join('v1', 'routes', Kumonos::DEFAULT_ROUTE_NAME, name, name)
     target.parent.mkpath unless target.parent.exist?
     target.write(out)
@@ -72,6 +79,13 @@ class KumonosCli < Thor
   end
 
   private
+
+  def validate_path!(path)
+    return if File.exist?(path)
+
+    warn("No such file or directory: #{path}")
+    exit 1
+  end
 
   def validate_service_definition!(definition, filepath)
     result = Kumonos::Schemas.validate_service_definition(definition)
