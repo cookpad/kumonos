@@ -84,7 +84,7 @@ module Kumonos
     end
 
     def service_to_cluster(service)
-      {
+      out = {
         name: service['name'],
         connect_timeout_ms: service['connect_timeout_ms'],
         type: 'strict_dns',
@@ -94,6 +94,8 @@ module Kumonos
           default: service['circuit_breaker']
         }
       }
+      out[:ssl_context] = {} if service['tls']
+      out
     end
   end
 end

@@ -24,6 +24,7 @@
         "required": [
           "name",
           "lb",
+          "tls",
           "connect_timeout_ms",
           "circuit_breaker",
           "routes"
@@ -38,6 +39,11 @@
             "type": "string",
             "id": "/properties/dependencies/items/properties/lb",
             "default": "host:port"
+          },
+          "tls": {
+            "type": "boolean",
+            "id": "/properties/dependencies/items/properties/tls",
+            "default": false
           },
           "connect_timeout_ms": {
             "type": "integer",

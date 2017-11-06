@@ -1,0 +1,18 @@
+# Example for using TLS
+version: 1
+dependencies:
+  - name: 'example'
+    lb: 'example.com:443'
+    tls: true
+    connect_timeout_ms: 250
+    circuit_breaker:
+      max_connections: 64
+      max_pending_requests: 128
+      max_retries: 3
+    routes:
+      - prefix: '/'
+        timeout_ms: 3000
+        retry_policy:
+          retry_on: '5xx,connect-failure,refused-stream'
+          num_retries: 3
+          per_try_timeout_ms: 1000
