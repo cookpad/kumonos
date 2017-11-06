@@ -1,4 +1,5 @@
 require 'bundler/setup'
+require 'pry'
 require 'kumonos'
 
 require 'rspec/json_matcher'

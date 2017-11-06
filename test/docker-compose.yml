@@ -16,11 +16,23 @@ services:
       ERROR_RATE: 5
     expose:
       - '8080'
+  nginx:
+    image: 'nginx'
+    volumes:
+      - './nginx.conf:/etc/nginx/nginx.conf'
+      - './srv:/srv'
+    ports:
+      - '3080:80'
+  socat:
+    image: 'alpine/socat'
+    command: ['TCP4-LISTEN:2000,fork,reuseaddr', 'STDOUT']
   envoy:
     image: 'lyft/envoy'
     depends_on:
       - 'user'
       - 'ab-testing'
+      - 'nginx'
+      - 'socat'
     command:
       - 'envoy'
       - '-c'

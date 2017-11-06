@@ -3,11 +3,13 @@ RSpec.describe Kumonos do
     expect(Kumonos::VERSION).not_to be nil
   end
 
-  it 'generates vaild config' do
+  let(:config) do
     filename = File.expand_path('../example/book.yml', __dir__)
-    config = YAML.load_file(filename)
-    out = JSON.dump(Kumonos.generate(config))
+    YAML.load_file(filename)
+  end
 
+  it 'generates vaild config' do
+    out = JSON.dump(Kumonos.generate(config))
     expect(out).to be_json_as(
       listeners: [
         {
@@ -21,6 +23,7 @@ RSpec.describe Kumonos do
                 stat_prefix: 'ingress_http',
                 access_log: [{ path: '/dev/stdout' }],
                 route_config: {
+                  validate_clusters: false,
                   virtual_hosts: [
                     {
                       name: 'user',
@@ -96,38 +99,66 @@ RSpec.describe Kumonos do
         access_log_path: '/dev/stdout',
         address: 'tcp://0.0.0.0:9901'
       },
+      statsd_tcp_cluster_name: 'statsd',
       cluster_manager: {
         clusters: [
           {
-            name: 'user',
+            name: 'statsd',
             connect_timeout_ms: 250,
-            type: 'logical_dns',
+            type: 'strict_dns',
             lb_type: 'round_robin',
-            hosts: [{ url: 'tcp://user:8080' }],
-            circuit_breakers: [
-              default: {
-                max_connections: 64,
-                max_pending_requests: 128,
-                max_retries: 3
-              }
+            hosts: [{ url: 'tcp://socat:2000' }]
+          }
+        ],
+        cds: {
+          cluster: {
+            name: 'nginx', # TODO
+            type: 'strict_dns',
+            connect_timeout_ms: 250,
+            lb_type: 'round_robin',
+            hosts: [
+              { url: 'tcp://nginx:80' } # TODO
             ]
           },
-          {
-            name: 'ab-testing',
-            connect_timeout_ms: 250,
-            type: 'logical_dns',
-            lb_type: 'round_robin',
-            hosts: [{ url: 'tcp://ab-testing:8080' }],
-            circuit_breakers: {
-              default: {
-                max_connections: 64,
-                max_pending_requests: 128,
-                max_retries: 3
-              }
+          refresh_delay_ms: 5000 # TODO
+        }
+      }
+    )
+  end
+
+  specify 'generate_clusters' do
+    out = JSON.dump(Kumonos.generate_clusters(config))
+    expect(out).to be_json_as(
+      clusters: [
+        {
+          name: 'user',
+          connect_timeout_ms: 250,
+          type: 'strict_dns',
+          lb_type: 'round_robin',
+          hosts: [{ url: 'tcp://user:8080' }],
+          circuit_breakers: {
+            default: {
+              max_connections: 64,
+              max_pending_requests: 128,
+              max_retries: 3
             }
           }
-        ]
-      }
+        },
+        {
+          name: 'ab-testing',
+          connect_timeout_ms: 250,
+          type: 'strict_dns',
+          lb_type: 'round_robin',
+          hosts: [{ url: 'tcp://ab-testing:8080' }],
+          circuit_breakers: {
+            default: {
+              max_connections: 64,
+              max_pending_requests: 128,
+              max_retries: 3
+            }
+          }
+        }
+      ]
     )
   end
 end

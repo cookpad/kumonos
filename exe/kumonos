@@ -4,6 +4,28 @@
 $LOAD_PATH.unshift(File.expand_path('../lib', __dir__))
 require 'kumonos'
 
-filename = ARGV[0]
-config = YAML.load_file(filename)
-puts JSON.dump(Kumonos.generate(config))
+require 'pathname'
+require 'thor'
+
+class KumonosCli < Thor
+  desc 'envoy FILEPATH', 'Generate envoy configuration'
+  def envoy(filepath)
+    config = YAML.load_file(filepath)
+    puts JSON.dump(Kumonos.generate(config))
+  end
+
+  desc 'clusters FILEPATH OUT', 'Generate clusters configuration'
+  def clusters(filepath, output_dir)
+    config = YAML.load_file(filepath)
+    out = JSON.dump(Kumonos.generate_clusters(config))
+
+    name = File.basename(filepath, '.*')
+    output_dir = Pathname.new(output_dir)
+    target = output_dir.join('v1', 'clusters', name, name)
+    target.parent.mkpath unless target.parent.exist?
+    target.write(out)
+    puts target
+  end
+end
+
+KumonosCli.start(ARGV)

@@ -7,7 +7,6 @@ module Kumonos
   class << self
     def generate(config)
       virtual_hosts = config['services'].map { |s| service_to_vhost(s) }
-      clusters = config['services'].map { |s| service_to_cluster(s) }
       {
         listeners: [
           {
@@ -20,6 +19,7 @@ module Kumonos
                 stat_prefix: 'ingress_http',
                 access_log: [{ path: '/dev/stdout' }],
                 route_config: {
+                  validate_clusters: false,
                   virtual_hosts: virtual_hosts
                 },
                 filters: [{ type: 'decoder', name: 'router', config: {} }]
@@ -31,9 +31,36 @@ module Kumonos
           access_log_path: '/dev/stdout',
           address: 'tcp://0.0.0.0:9901'
         },
+        statsd_tcp_cluster_name: 'statsd',
         cluster_manager: {
-          clusters: clusters
+          clusters: [
+            {
+              name: 'statsd',
+              connect_timeout_ms: 250,
+              type: 'strict_dns',
+              lb_type: 'round_robin',
+              hosts: [{ url: 'tcp://socat:2000' }]
+            }
+          ],
+          cds: {
+            cluster: {
+              name: 'nginx', # TODO
+              type: 'strict_dns',
+              connect_timeout_ms: 250,
+              lb_type: 'round_robin',
+              hosts: [
+                { url: 'tcp://nginx:80' } # TODO
+              ]
+            },
+            refresh_delay_ms: 5000 # TODO
+          }
         }
+      }
+    end
+
+    def generate_clusters(config)
+      {
+        clusters: config['services'].map { |s| service_to_cluster(s) }
       }
     end
 
@@ -67,7 +94,7 @@ module Kumonos
       {
         name: service['name'],
         connect_timeout_ms: service['connect_timeout_ms'],
-        type: 'logical_dns',
+        type: 'strict_dns',
         lb_type: 'round_robin',
         hosts: [{ url: "tcp://#{service['lb']}" }],
         circuit_breakers: {
