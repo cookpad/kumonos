@@ -93,7 +93,7 @@ RSpec.describe Kumonos do
               retry_policy: {
                 retry_on: '5xx,connect-failure,refused-stream',
                 num_retries: 3,
-                per_try_timeout_ms: 250
+                per_try_timeout_ms: 1_000
               },
               headers: [
                 {
@@ -121,7 +121,7 @@ RSpec.describe Kumonos do
               retry_policy: {
                 retry_on: '5xx,connect-failure,refused-stream',
                 num_retries: 3,
-                per_try_timeout_ms: 250
+                per_try_timeout_ms: 1_000
               },
               headers: [
                 {

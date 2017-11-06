@@ -15,7 +15,7 @@ dependencies:
         retry_policy:
           retry_on: '5xx,connect-failure,refused-stream'
           num_retries: 3
-          per_try_timeout_ms: 250
+          per_try_timeout_ms: 1000
   - name: 'ab-testing'
     lb: 'ab-testing:8080'
     connect_timeout_ms: 250
@@ -29,4 +29,4 @@ dependencies:
         retry_policy:
           retry_on: '5xx,connect-failure,refused-stream'
           num_retries: 3
-          per_try_timeout_ms: 250
+          per_try_timeout_ms: 1000

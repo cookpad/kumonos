@@ -53,6 +53,18 @@ class KumonosCli < Thor
     puts target
   end
 
+  desc 'init NAME', 'Generate a service definition'
+  def init(name)
+    definition = YAML.load_file(File.expand_path('../example/book.yml', __dir__))
+    definition['dependencies'] = definition.fetch('dependencies')[0..0]
+    dep = definition['dependencies'][0]
+    dep['name'] = 'target-service-name'
+    dep['lb'] = 'hostname-for-load-balancer:port'
+    path = "#{name}.yml"
+    File.open(path, 'w') { |f| YAML.dump(definition, f) }
+    puts path
+  end
+
   private
 
   def validate_service_definition!(definition, filepath)
