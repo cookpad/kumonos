@@ -46,10 +46,9 @@ module Kumonos
     end
 
     def generate_routes(definition)
-      virtual_hosts = definition['dependencies'].map { |s| service_to_vhost(s) }
       {
         validate_clusters: false,
-        virtual_hosts: virtual_hosts
+        virtual_hosts: definition['dependencies'].map { |s| service_to_vhost(s) }
       }
     end
 
@@ -63,7 +62,6 @@ module Kumonos
 
     def service_to_vhost(service)
       name = service['name']
-
       {
         name: name,
         domains: [name],
