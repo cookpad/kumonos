@@ -1,6 +1,7 @@
+#!/usr/bin/env ruby
 level = ARGV.first
 if level.nil?
-  warn "Example: ruby #{__FILE__} (tiny|minor|major)"
+  warn "Example: #{__FILE__} (tiny|minor|major)"
   exit 1
 end
 
@@ -25,7 +26,7 @@ when 'major'
   version_strs[1] = 0
   version_strs[2] = 0
 else
-  warn "Example: ruby #{__FILE__} (tiny|minor|major)"
+  warn "Example: #{__FILE__} (tiny|minor|major)"
   exit 1
 end
 
