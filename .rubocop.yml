@@ -1,3 +1,6 @@
+AllCops:
+  DisplayCopNames: true
+
 Metrics/BlockLength:
   Enabled: false
 Metrics/ClassLength:
