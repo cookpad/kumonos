@@ -14,7 +14,7 @@ module Kumonos
       private
 
       def symbolize_keys(hash)
-        new = hash.map do |k,v|
+        new = hash.map do |k, v|
           [
             k.to_sym,
             Hash === v ? symbolize_keys(v) : v

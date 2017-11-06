@@ -14,9 +14,9 @@ class KumonosCli < Thor
     h = JSON.parse(File.read(options[:config]))
     result = Kumonos::Schemas.validate_kumonos_config(h)
     unless result.empty?
-      $stderr.puts("#{options[:config]} has invalid format:")
-      $stderr.puts(result)
-      $stderr.puts("A schema file for kumonos-configuration is #{Kumonos::Schemas::CONFIG_SCHEMA_PATH}")
+      warn("#{options[:config]} has invalid format:")
+      warn(result)
+      warn("A schema file for kumonos-configuration is #{Kumonos::Schemas::CONFIG_SCHEMA_PATH}")
       exit 1
     end
 

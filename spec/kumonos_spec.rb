@@ -31,7 +31,7 @@ RSpec.describe Kumonos do
                 rds: {
                   cluster: 'nginx',
                   route_config_name: 'test',
-                  refresh_delay_ms: 30000
+                  refresh_delay_ms: 30_000
                 },
                 filters: [
                   {
@@ -70,7 +70,7 @@ RSpec.describe Kumonos do
               { url: 'tcp://nginx:80' } # TODO
             ]
           },
-          refresh_delay_ms: 30000 # TODO
+          refresh_delay_ms: 30_000 # TODO
         }
       }
     )
