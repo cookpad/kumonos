@@ -69,12 +69,12 @@ class KumonosCli < Thor
 
   def validate_service_definition!(definition, filepath)
     result = Kumonos::Schemas.validate_service_definition(definition)
-    unless result.empty?
-      warn("#{filepath} has invalid format:")
-      warn(result)
-      warn("A schema file is #{Kumonos::Schemas::SERVIVE_DEFINITION_PATH}")
-      exit 1
-    end
+    return if result.empty?
+
+    warn("#{filepath} has invalid format:")
+    warn(result)
+    warn("A schema file is #{Kumonos::Schemas::SERVIVE_DEFINITION_PATH}")
+    exit 1
   end
 end
 

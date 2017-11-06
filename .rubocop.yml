@@ -1,5 +1,6 @@
 AllCops:
   DisplayCopNames: true
+  DisplayStyleGuide: true
 
 Metrics/BlockLength:
   Enabled: false
