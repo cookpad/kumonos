@@ -3,13 +3,13 @@ RSpec.describe Kumonos do
     expect(Kumonos::VERSION).not_to be nil
   end
 
-  let(:config) do
+  let(:definition) do
     filename = File.expand_path('../example/book.yml', __dir__)
     YAML.load_file(filename)
   end
 
   it 'generates vaild config' do
-    out = JSON.dump(Kumonos.generate(config, 'test'))
+    out = JSON.dump(Kumonos.generate(definition, 'test'))
     expect(out).to be_json_as(
       listeners: [
         {
@@ -71,7 +71,7 @@ RSpec.describe Kumonos do
   end
 
   specify 'generate_routes' do
-    out = JSON.dump(Kumonos.generate_routes(config))
+    out = JSON.dump(Kumonos.generate_routes(definition))
 
     expect(out).to be_json_as(
       validate_clusters: false,
@@ -137,7 +137,7 @@ RSpec.describe Kumonos do
   end
 
   specify 'generate_clusters' do
-    out = JSON.dump(Kumonos.generate_clusters(config))
+    out = JSON.dump(Kumonos.generate_clusters(definition))
     expect(out).to be_json_as(
       clusters: [
         {

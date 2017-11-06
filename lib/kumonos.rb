@@ -5,7 +5,7 @@ require 'kumonos/version'
 # Kumonos
 module Kumonos
   class << self
-    def generate(config, name)
+    def generate(definition, name)
       {
         listeners: [
           {
@@ -58,17 +58,17 @@ module Kumonos
       }
     end
 
-    def generate_routes(config)
-      virtual_hosts = config['services'].map { |s| service_to_vhost(s) }
+    def generate_routes(definition)
+      virtual_hosts = definition['services'].map { |s| service_to_vhost(s) }
       {
         validate_clusters: false,
         virtual_hosts: virtual_hosts
       }
     end
 
-    def generate_clusters(config)
+    def generate_clusters(definition)
       {
-        clusters: config['services'].map { |s| service_to_cluster(s) }
+        clusters: definition['services'].map { |s| service_to_cluster(s) }
       }
     end
 
@@ -84,7 +84,7 @@ module Kumonos
       }
     end
 
-    # Split route config to apply retry config only to GET/HEAD requests.
+    # Split route definition to apply retry definition only to GET/HEAD requests.
     def split_route(route, name)
       base = {
         prefix: route['prefix'],

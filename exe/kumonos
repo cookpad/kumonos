@@ -11,15 +11,15 @@ class KumonosCli < Thor
   desc 'envoy FILEPATH', 'Generate envoy configuration'
   def envoy(filepath)
     name = File.basename(filepath, '.*')
-    config = YAML.load_file(filepath)
-    puts JSON.dump(Kumonos.generate(config, name))
+    definition = YAML.load_file(filepath)
+    puts JSON.dump(Kumonos.generate(definition, name))
   end
 
   desc 'clusters FILEPATH OUT', 'Generate clusters configuration'
   def clusters(filepath, output_dir)
     name = File.basename(filepath, '.*')
-    config = YAML.load_file(filepath)
-    out = JSON.dump(Kumonos.generate_clusters(config))
+    definition = YAML.load_file(filepath)
+    out = JSON.dump(Kumonos.generate_clusters(definition))
 
     output_dir = Pathname.new(output_dir)
     target = output_dir.join('v1', 'clusters', name, name)
@@ -31,8 +31,8 @@ class KumonosCli < Thor
   desc 'routes FILEPATH OUT', 'Generate routes configuration'
   def routes(filepath, output_dir)
     name = File.basename(filepath, '.*')
-    config = YAML.load_file(filepath)
-    out = JSON.dump(Kumonos.generate_routes(config))
+    definition = YAML.load_file(filepath)
+    out = JSON.dump(Kumonos.generate_routes(definition))
 
     output_dir = Pathname.new(output_dir)
     target = output_dir.join('v1', 'routes', name, name, name)
