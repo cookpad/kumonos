@@ -14,7 +14,7 @@ class KumonosCli < Thor
   end
 
   desc 'envoy', 'Generate envoy configuration'
-  method_option :config, aliases: '-c', desc: 'Configuration file for kumonos'
+  method_option :config, aliases: '-c', desc: 'Configuration file for kumonos', required: true, type: :string
   def envoy
     h = JSON.parse(File.read(options[:config]))
     result = Kumonos::Schemas.validate_kumonos_config(h)
@@ -29,28 +29,30 @@ class KumonosCli < Thor
     puts JSON.dump(Kumonos.generate(config))
   end
 
-  desc 'clusters FILEPATH OUT', 'Generate clusters configuration'
-  def clusters(filepath, output_dir)
+  desc 'clusters SERVIVE_DEFINITION_PATH', 'Generate clusters configuration'
+  method_option :output, aliases: '-o', desc: 'Output directory', required: true, type: :string
+  def clusters(filepath)
     name = File.basename(filepath, '.*')
     definition = YAML.load_file(filepath)
     validate_service_definition!(definition, filepath)
     out = JSON.dump(Kumonos.generate_clusters(definition))
 
-    output_dir = Pathname.new(output_dir)
+    output_dir = Pathname.new(options[:output])
     target = output_dir.join('v1', 'clusters', name, name)
     target.parent.mkpath unless target.parent.exist?
     target.write(out)
     puts target
   end
 
-  desc 'routes FILEPATH OUT', 'Generate routes configuration'
-  def routes(filepath, output_dir)
+  desc 'routes SERVIVE_DEFINITION_PATH', 'Generate routes configuration'
+  method_option :output, aliases: '-o', desc: 'Output directory', required: true, type: :string
+  def routes(filepath)
     name = File.basename(filepath, '.*')
     definition = YAML.load_file(filepath)
     validate_service_definition!(definition, filepath)
     out = JSON.dump(Kumonos.generate_routes(definition))
 
-    output_dir = Pathname.new(output_dir)
+    output_dir = Pathname.new(options[:output])
     target = output_dir.join('v1', 'routes', Kumonos::DEFAULT_ROUTE_NAME, name, name)
     target.parent.mkpath unless target.parent.exist?
     target.write(out)

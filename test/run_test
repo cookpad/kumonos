@@ -5,8 +5,8 @@ docker-compose down
 ../exe/kumonos envoy -c ../example/kumonos.json > config.json
 rm -rf srv
 mkdir srv
-../exe/kumonos clusters ../example/book.yml srv
-../exe/kumonos routes ../example/book.yml srv
+../exe/kumonos clusters -o srv ../example/book.yml
+../exe/kumonos routes -o srv ../example/book.yml
 docker-compose up --build -d
 ruby test.rb
 docker-compose down
