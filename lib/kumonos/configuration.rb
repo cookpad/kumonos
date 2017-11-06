@@ -1,5 +1,5 @@
 module Kumonos
-  class Configuration < Struct.new(:version, :ds, :statsd, :listener, :admin)
+  Configuration = Struct.new(:version, :ds, :statsd, :listener, :admin) do
     class << self
       def from_hash(h)
         new(
@@ -17,7 +17,7 @@ module Kumonos
         new = hash.map do |k, v|
           [
             k.to_sym,
-            Hash === v ? symbolize_keys(v) : v
+            v.is_a?(Hash) ? symbolize_keys(v) : v
           ]
         end
         new.to_h

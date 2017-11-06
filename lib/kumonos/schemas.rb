@@ -2,6 +2,7 @@ require 'pathname'
 require 'json-schema'
 
 module Kumonos
+  # Schemas
   module Schemas
     ROOT = Pathname.new(File.expand_path('../schemas', __dir__))
     CONFIG_SCHEMA_PATH = ROOT.join('kumonos_config.json')

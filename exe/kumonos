@@ -7,6 +7,7 @@ require 'kumonos'
 require 'pathname'
 require 'thor'
 
+# KumonosCli
 class KumonosCli < Thor
   desc 'envoy SERVIVE_NAME', 'Generate envoy configuration'
   method_option :config, aliases: '-c', desc: 'Configuration file for kumonos'
