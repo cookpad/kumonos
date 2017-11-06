@@ -4,6 +4,7 @@ require 'yaml'
 require 'kumonos/version'
 require 'kumonos/schemas'
 require 'kumonos/configuration'
+require 'kumonos/routes'
 
 # Kumonos
 module Kumonos
@@ -47,13 +48,6 @@ module Kumonos
       }
     end
 
-    def generate_routes(definition)
-      {
-        validate_clusters: false,
-        virtual_hosts: definition['dependencies'].map { |s| service_to_vhost(s) }
-      }
-    end
-
     def generate_clusters(definition)
       {
         clusters: definition['dependencies'].map { |s| service_to_cluster(s) }
@@ -61,29 +55,6 @@ module Kumonos
     end
 
     private
-
-    def service_to_vhost(service)
-      name = service['name']
-      {
-        name: name,
-        domains: [name],
-        routes: service['routes'].flat_map { |r| split_route(r, name) }
-      }
-    end
-
-    # Split route definition to apply retry definition only to GET/HEAD requests.
-    def split_route(route, name)
-      base = {
-        prefix: route['prefix'],
-        timeout_ms: route['timeout_ms'],
-        cluster: name
-      }
-      with_retry = base.merge(
-        retry_policy: route['retry_policy'],
-        headers: [{ name: ':method', value: '(GET|HEAD)', regex: true }]
-      )
-      [with_retry, base]
-    end
 
     def service_to_cluster(service)
       out = {

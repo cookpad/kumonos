@@ -50,7 +50,7 @@ class KumonosCli < Thor
     name = File.basename(filepath, '.*')
     definition = YAML.load_file(filepath)
     validate_service_definition!(definition, filepath)
-    out = JSON.dump(Kumonos.generate_routes(definition))
+    out = JSON.dump(Kumonos::Routes.generate(definition))
 
     output_dir = Pathname.new(options[:output])
     target = output_dir.join('v1', 'routes', Kumonos::DEFAULT_ROUTE_NAME, name, name)
