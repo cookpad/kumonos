@@ -35,9 +35,9 @@ class KumonosCli < Thor
     name = File.basename(filepath, '.*')
     definition = YAML.load_file(filepath)
     validate_service_definition!(definition, filepath)
-    out = JSON.dump(Kumonos.generate_clusters(definition))
 
     output_dir = Pathname.new(options[:output])
+    out = JSON.dump(Kumonos::Clusters.generate(definition))
     target = output_dir.join('v1', 'clusters', name, name)
     target.parent.mkpath unless target.parent.exist?
     target.write(out)
