@@ -1,0 +1,131 @@
+{
+  "definitions": {},
+  "$schema": "http://json-schema.org/draft-04/schema#",
+  "type": "object",
+  "id": "service-definition",
+  "additionalProperties": false,
+  "required": [
+    "version",
+    "dependencies"
+  ],
+  "properties": {
+    "version": {
+      "type": "integer",
+      "id": "/properties/version",
+      "default": 1
+    },
+    "dependencies": {
+      "type": "array",
+      "id": "/properties/dependencies",
+      "items": {
+        "type": "object",
+        "id": "/properties/dependencies/items",
+        "additionalProperties": false,
+        "required": [
+          "name",
+          "lb",
+          "connect_timeout_ms",
+          "circuit_breaker",
+          "routes"
+        ],
+        "properties": {
+          "name": {
+            "type": "string",
+            "id": "/properties/dependencies/items/properties/name",
+            "default": "dependency-service-name"
+          },
+          "lb": {
+            "type": "string",
+            "id": "/properties/dependencies/items/properties/lb",
+            "default": "host:port"
+          },
+          "connect_timeout_ms": {
+            "type": "integer",
+            "id": "/properties/dependencies/items/properties/connect_timeout_ms",
+            "default": 250
+          },
+          "circuit_breaker": {
+            "type": "object",
+            "id": "/properties/dependencies/items/properties/circuit_breaker",
+            "additionalProperties": false,
+            "required": [
+              "max_connections",
+              "max_pending_requests",
+              "max_retries"
+            ],
+            "properties": {
+              "max_connections": {
+                "type": "integer",
+                "id": "/properties/dependencies/items/properties/circuit_breaker/properties/max_connections",
+                "default": 64
+              },
+              "max_pending_requests": {
+                "type": "integer",
+                "id": "/properties/dependencies/items/properties/circuit_breaker/properties/max_pending_requests",
+                "default": 128
+              },
+              "max_retries": {
+                "type": "integer",
+                "id": "/properties/dependencies/items/properties/circuit_breaker/properties/max_retries",
+                "default": 3
+              }
+            }
+          },
+          "routes": {
+            "type": "array",
+            "id": "/properties/dependencies/items/properties/routes",
+            "items": {
+              "type": "object",
+              "id": "/properties/dependencies/items/properties/routes/items",
+              "additionalProperties": false,
+              "required": [
+                "prefix",
+                "timeout_ms",
+                "retry_policy"
+              ],
+              "properties": {
+                "prefix": {
+                  "type": "string",
+                  "id": "/properties/dependencies/items/properties/routes/items/properties/prefix",
+                  "default": "/"
+                },
+                "timeout_ms": {
+                  "type": "integer",
+                  "id": "/properties/dependencies/items/properties/routes/items/properties/timeout_ms",
+                  "default": 3000
+                },
+                "retry_policy": {
+                  "type": "object",
+                  "id": "/properties/dependencies/items/properties/routes/items/properties/retry_policy",
+                  "additionalProperties": false,
+                  "required": [
+                    "retry_on",
+                    "num_retries",
+                    "per_try_timeout_ms"
+                  ],
+                  "properties": {
+                    "retry_on": {
+                      "type": "string",
+                      "id": "/properties/dependencies/items/properties/routes/items/properties/retry_policy/properties/retry_on",
+                      "default": "5xx,connect-failure,refused-stream"
+                    },
+                    "num_retries": {
+                      "type": "integer",
+                      "id": "/properties/dependencies/items/properties/routes/items/properties/retry_policy/properties/num_retries",
+                      "default": 3
+                    },
+                    "per_try_timeout_ms": {
+                      "type": "integer",
+                      "id": "/properties/dependencies/items/properties/routes/items/properties/retry_policy/properties/per_try_timeout_ms",
+                      "default": 1000
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+  }
+}

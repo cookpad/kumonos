@@ -29,6 +29,7 @@ class KumonosCli < Thor
   def clusters(filepath, output_dir)
     name = File.basename(filepath, '.*')
     definition = YAML.load_file(filepath)
+    validate_service_definition!(definition, filepath)
     out = JSON.dump(Kumonos.generate_clusters(definition))
 
     output_dir = Pathname.new(output_dir)
@@ -42,6 +43,7 @@ class KumonosCli < Thor
   def routes(filepath, output_dir)
     name = File.basename(filepath, '.*')
     definition = YAML.load_file(filepath)
+    validate_service_definition!(definition, filepath)
     out = JSON.dump(Kumonos.generate_routes(definition))
 
     output_dir = Pathname.new(output_dir)
@@ -49,6 +51,18 @@ class KumonosCli < Thor
     target.parent.mkpath unless target.parent.exist?
     target.write(out)
     puts target
+  end
+
+  private
+
+  def validate_service_definition!(definition, filepath)
+    result = Kumonos::Schemas.validate_service_definition(definition)
+    unless result.empty?
+      warn("#{filepath} has invalid format:")
+      warn(result)
+      warn("A schema file is #{Kumonos::Schemas::SERVIVE_DEFINITION_PATH}")
+      exit 1
+    end
   end
 end
 
