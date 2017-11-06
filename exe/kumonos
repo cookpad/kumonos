@@ -10,18 +10,32 @@ require 'thor'
 class KumonosCli < Thor
   desc 'envoy FILEPATH', 'Generate envoy configuration'
   def envoy(filepath)
+    name = File.basename(filepath, '.*')
     config = YAML.load_file(filepath)
-    puts JSON.dump(Kumonos.generate(config))
+    puts JSON.dump(Kumonos.generate(config, name))
   end
 
   desc 'clusters FILEPATH OUT', 'Generate clusters configuration'
   def clusters(filepath, output_dir)
+    name = File.basename(filepath, '.*')
     config = YAML.load_file(filepath)
     out = JSON.dump(Kumonos.generate_clusters(config))
 
-    name = File.basename(filepath, '.*')
     output_dir = Pathname.new(output_dir)
     target = output_dir.join('v1', 'clusters', name, name)
+    target.parent.mkpath unless target.parent.exist?
+    target.write(out)
+    puts target
+  end
+
+  desc 'routes FILEPATH OUT', 'Generate routes configuration'
+  def routes(filepath, output_dir)
+    name = File.basename(filepath, '.*')
+    config = YAML.load_file(filepath)
+    out = JSON.dump(Kumonos.generate_routes(config))
+
+    output_dir = Pathname.new(output_dir)
+    target = output_dir.join('v1', 'routes', name, name, name)
     target.parent.mkpath unless target.parent.exist?
     target.write(out)
     puts target

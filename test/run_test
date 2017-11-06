@@ -1,9 +1,12 @@
 #!/bin/bash
 set -ex
 
+docker-compose down
 ../exe/kumonos envoy ../example/book.yml > config.json
-mkdir -p srv/cds
-../exe/kumonos clusters ../example/book.yml srv/cds
+rm -rf srv
+mkdir srv
+../exe/kumonos clusters ../example/book.yml srv
+../exe/kumonos routes ../example/book.yml srv
 docker-compose up --build -d
 ruby test.rb
 docker-compose down

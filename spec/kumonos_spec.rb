@@ -9,7 +9,7 @@ RSpec.describe Kumonos do
   end
 
   it 'generates vaild config' do
-    out = JSON.dump(Kumonos.generate(config))
+    out = JSON.dump(Kumonos.generate(config, 'test'))
     expect(out).to be_json_as(
       listeners: [
         {
@@ -22,66 +22,10 @@ RSpec.describe Kumonos do
                 codec_type: 'auto',
                 stat_prefix: 'ingress_http',
                 access_log: [{ path: '/dev/stdout' }],
-                route_config: {
-                  validate_clusters: false,
-                  virtual_hosts: [
-                    {
-                      name: 'user',
-                      domains: ['user'],
-                      routes: [
-                        {
-                          prefix: '/',
-                          timeout_ms: 3000,
-                          cluster: 'user',
-                          retry_policy: {
-                            retry_on: '5xx,connect-failure,refused-stream',
-                            num_retries: 3,
-                            per_try_timeout_ms: 250
-                          },
-                          headers: [
-                            {
-                              name: ':method',
-                              value: '(GET|HEAD)',
-                              regex: true
-                            }
-                          ]
-                        },
-                        {
-                          prefix: '/',
-                          timeout_ms: 3000,
-                          cluster: 'user'
-                        }
-                      ]
-                    },
-                    {
-                      name: 'ab-testing',
-                      domains: ['ab-testing'],
-                      routes: [
-                        {
-                          prefix: '/',
-                          timeout_ms: 3000,
-                          cluster: 'ab-testing',
-                          retry_policy: {
-                            retry_on: '5xx,connect-failure,refused-stream',
-                            num_retries: 3,
-                            per_try_timeout_ms: 250
-                          },
-                          headers: [
-                            {
-                              name: ':method',
-                              value: '(GET|HEAD)',
-                              regex: true
-                            }
-                          ]
-                        },
-                        {
-                          prefix: '/',
-                          timeout_ms: 3000,
-                          cluster: 'ab-testing'
-                        }
-                      ]
-                    }
-                  ]
+                rds: {
+                  cluster: 'nginx',
+                  route_config_name: 'test',
+                  refresh_delay_ms: 30000
                 },
                 filters: [
                   {
@@ -120,9 +64,75 @@ RSpec.describe Kumonos do
               { url: 'tcp://nginx:80' } # TODO
             ]
           },
-          refresh_delay_ms: 5000 # TODO
+          refresh_delay_ms: 30000 # TODO
         }
       }
+    )
+  end
+
+  specify 'generate_routes' do
+    out = JSON.dump(Kumonos.generate_routes(config))
+
+    expect(out).to be_json_as(
+      validate_clusters: false,
+      virtual_hosts: [
+        {
+          name: 'user',
+          domains: ['user'],
+          routes: [
+            {
+              prefix: '/',
+              timeout_ms: 3000,
+              cluster: 'user',
+              retry_policy: {
+                retry_on: '5xx,connect-failure,refused-stream',
+                num_retries: 3,
+                per_try_timeout_ms: 250
+              },
+              headers: [
+                {
+                  name: ':method',
+                  value: '(GET|HEAD)',
+                  regex: true
+                }
+              ]
+            },
+            {
+              prefix: '/',
+              timeout_ms: 3000,
+              cluster: 'user'
+            }
+          ]
+        },
+        {
+          name: 'ab-testing',
+          domains: ['ab-testing'],
+          routes: [
+            {
+              prefix: '/',
+              timeout_ms: 3000,
+              cluster: 'ab-testing',
+              retry_policy: {
+                retry_on: '5xx,connect-failure,refused-stream',
+                num_retries: 3,
+                per_try_timeout_ms: 250
+              },
+              headers: [
+                {
+                  name: ':method',
+                  value: '(GET|HEAD)',
+                  regex: true
+                }
+              ]
+            },
+            {
+              prefix: '/',
+              timeout_ms: 3000,
+              cluster: 'ab-testing'
+            }
+          ]
+        }
+      ]
     )
   end
 

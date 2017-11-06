@@ -5,8 +5,7 @@ require 'kumonos/version'
 # Kumonos
 module Kumonos
   class << self
-    def generate(config)
-      virtual_hosts = config['services'].map { |s| service_to_vhost(s) }
+    def generate(config, name)
       {
         listeners: [
           {
@@ -18,9 +17,10 @@ module Kumonos
                 codec_type: 'auto',
                 stat_prefix: 'ingress_http',
                 access_log: [{ path: '/dev/stdout' }],
-                route_config: {
-                  validate_clusters: false,
-                  virtual_hosts: virtual_hosts
+                rds: {
+                  cluster: 'nginx', # TODO
+                  route_config_name: name,
+                  refresh_delay_ms: 30000
                 },
                 filters: [{ type: 'decoder', name: 'router', config: {} }]
               }
@@ -52,9 +52,17 @@ module Kumonos
                 { url: 'tcp://nginx:80' } # TODO
               ]
             },
-            refresh_delay_ms: 5000 # TODO
+            refresh_delay_ms: 30000 # TODO
           }
         }
+      }
+    end
+
+    def generate_routes(config)
+      virtual_hosts = config['services'].map { |s| service_to_vhost(s) }
+      {
+        validate_clusters: false,
+        virtual_hosts: virtual_hosts
       }
     end
 
