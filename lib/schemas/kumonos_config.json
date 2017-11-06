@@ -1,0 +1,174 @@
+{
+  "definitions": {},
+  "$schema": "http://json-schema.org/draft-04/schema#",
+  "type": "object",
+  "id": "kumonos-configuration",
+  "additionalProperties": false,
+  "required": [
+    "version",
+    "ds",
+    "statsd",
+    "listener",
+    "admin"
+  ],
+  "properties": {
+    "version": {
+      "type": "integer",
+      "id": "/properties/version"
+    },
+    "ds": {
+      "type": "object",
+      "id": "/properties/ds",
+      "additionalProperties": false,
+      "required": [
+        "name",
+        "refresh_delay_ms",
+        "cluster"
+      ],
+      "properties": {
+        "name": {
+          "type": "string",
+          "id": "/properties/ds/properties/name"
+        },
+        "refresh_delay_ms": {
+          "type": "integer",
+          "id": "/properties/ds/properties/refresh_delay_ms"
+        },
+        "cluster": {
+          "type": "object",
+          "id": "/properties/ds/properties/cluster",
+          "additionalProperties": false,
+          "required": [
+            "name",
+            "type",
+            "connect_timeout_ms",
+            "lb_type",
+            "hosts"
+          ],
+          "properties": {
+            "name": {
+              "type": "string",
+              "id": "/properties/ds/properties/cluster/properties/name"
+            },
+            "type": {
+              "type": "string",
+              "id": "/properties/ds/properties/cluster/properties/type"
+            },
+            "connect_timeout_ms": {
+              "type": "integer",
+              "id": "/properties/ds/properties/cluster/properties/connect_timeout_ms"
+            },
+            "lb_type": {
+              "type": "string",
+              "id": "/properties/ds/properties/cluster/properties/lb_type"
+            },
+            "hosts": {
+              "type": "array",
+              "id": "/properties/ds/properties/cluster/properties/hosts",
+              "items": {
+                "type": "object",
+                "id": "/properties/ds/properties/cluster/properties/hosts/items",
+                "additionalProperties": false,
+                "required": [
+                  "url"
+                ],
+                "properties": {
+                  "url": {
+                    "type": "string",
+                    "id": "/properties/ds/properties/cluster/properties/hosts/items/properties/url"
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "statsd": {
+      "type": "object",
+      "id": "/properties/statsd",
+      "additionalProperties": false,
+      "required": [
+        "name",
+        "connect_timeout_ms",
+        "type",
+        "lb_type",
+        "hosts"
+      ],
+      "properties": {
+        "name": {
+          "type": "string",
+          "id": "/properties/statsd/properties/name"
+        },
+        "connect_timeout_ms": {
+          "type": "integer",
+          "id": "/properties/statsd/properties/connect_timeout_ms"
+        },
+        "type": {
+          "type": "string",
+          "id": "/properties/statsd/properties/type"
+        },
+        "lb_type": {
+          "type": "string",
+          "id": "/properties/statsd/properties/lb_type"
+        },
+        "hosts": {
+          "type": "array",
+          "id": "/properties/statsd/properties/hosts",
+          "items": {
+            "type": "object",
+            "id": "/properties/statsd/properties/hosts/items",
+            "additionalProperties": false,
+            "required": [
+              "url"
+            ],
+            "properties": {
+              "url": {
+                "type": "string",
+                "id": "/properties/statsd/properties/hosts/items/properties/url"
+              }
+            }
+          }
+        }
+      }
+    },
+    "listener": {
+      "type": "object",
+      "id": "/properties/listener",
+      "additionalProperties": false,
+      "required": [
+        "address",
+        "access_log_path"
+      ],
+      "properties": {
+        "address": {
+          "type": "string",
+          "id": "/properties/listener/properties/address"
+        },
+        "access_log_path": {
+          "type": "string",
+          "id": "/properties/listener/properties/access_log_path"
+        }
+      }
+    },
+    "admin": {
+      "type": "object",
+      "id": "/properties/admin",
+      "additionalProperties": false,
+      "required": [
+        "address",
+        "access_log_path"
+      ],
+      "properties": {
+        "address": {
+          "type": "string",
+          "id": "/properties/admin/properties/address"
+        },
+        "access_log_path": {
+          "type": "string",
+          "id": "/properties/admin/properties/access_log_path"
+        }
+      }
+    }
+  }
+}

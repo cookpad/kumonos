@@ -8,8 +8,14 @@ RSpec.describe Kumonos do
     YAML.load_file(filename)
   end
 
+  let(:config) do
+    filename = File.expand_path('../example/kumonos.json', __dir__)
+    h = JSON.parse(File.read(filename))
+    Kumonos::Configuration.from_hash(h)
+  end
+
   it 'generates vaild config' do
-    out = JSON.dump(Kumonos.generate(definition, 'test'))
+    out = JSON.dump(Kumonos.generate(config, 'test'))
     expect(out).to be_json_as(
       listeners: [
         {

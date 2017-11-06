@@ -1,26 +1,29 @@
 require 'json'
 require 'yaml'
+
 require 'kumonos/version'
+require 'kumonos/schemas'
+require 'kumonos/configuration'
 
 # Kumonos
 module Kumonos
   class << self
-    def generate(definition, name)
+    def generate(config, name)
       {
         listeners: [
           {
-            address: 'tcp://0.0.0.0:9211',
+            address: config.listener.fetch(:address),
             filters: [
               type: 'read',
               name: 'http_connection_manager',
               config: {
                 codec_type: 'auto',
                 stat_prefix: 'ingress_http',
-                access_log: [{ path: '/dev/stdout' }],
+                access_log: [{ path: config.listener.fetch(:access_log_path) }],
                 rds: {
-                  cluster: 'nginx', # TODO
+                  cluster: config.ds.fetch(:name),
                   route_config_name: name,
-                  refresh_delay_ms: 30000
+                  refresh_delay_ms: config.ds.fetch(:refresh_delay_ms)
                 },
                 filters: [{ type: 'decoder', name: 'router', config: {} }]
               }
@@ -28,31 +31,15 @@ module Kumonos
           }
         ],
         admin: {
-          access_log_path: '/dev/stdout',
-          address: 'tcp://0.0.0.0:9901'
+          access_log_path: config.admin.fetch(:access_log_path),
+          address: config.admin.fetch(:address)
         },
-        statsd_tcp_cluster_name: 'statsd',
+        statsd_tcp_cluster_name: config.statsd.fetch(:name),
         cluster_manager: {
-          clusters: [
-            {
-              name: 'statsd',
-              connect_timeout_ms: 250,
-              type: 'strict_dns',
-              lb_type: 'round_robin',
-              hosts: [{ url: 'tcp://socat:2000' }]
-            }
-          ],
+          clusters: [config.statsd],
           cds: {
-            cluster: {
-              name: 'nginx', # TODO
-              type: 'strict_dns',
-              connect_timeout_ms: 250,
-              lb_type: 'round_robin',
-              hosts: [
-                { url: 'tcp://nginx:80' } # TODO
-              ]
-            },
-            refresh_delay_ms: 30000 # TODO
+            cluster: config.ds.fetch(:cluster),
+            refresh_delay_ms: config.ds.fetch(:refresh_delay_ms)
           }
         }
       }

@@ -8,11 +8,20 @@ require 'pathname'
 require 'thor'
 
 class KumonosCli < Thor
-  desc 'envoy FILEPATH', 'Generate envoy configuration'
-  def envoy(filepath)
-    name = File.basename(filepath, '.*')
-    definition = YAML.load_file(filepath)
-    puts JSON.dump(Kumonos.generate(definition, name))
+  desc 'envoy SERVIVE_NAME', 'Generate envoy configuration'
+  method_option :config, aliases: '-c', desc: 'Configuration file for kumonos'
+  def envoy(service_name)
+    h = JSON.parse(File.read(options[:config]))
+    result = Kumonos::Schemas.validate_kumonos_config(h)
+    unless result.empty?
+      $stderr.puts("#{options[:config]} has invalid format:")
+      $stderr.puts(result)
+      $stderr.puts("A schema file for kumonos-configuration is #{Kumonos::Schemas::CONFIG_SCHEMA_PATH}")
+      exit 1
+    end
+
+    config = Kumonos::Configuration.from_hash(h)
+    puts JSON.dump(Kumonos.generate(config, service_name))
   end
 
   desc 'clusters FILEPATH OUT', 'Generate clusters configuration'
