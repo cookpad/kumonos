@@ -1,7 +1,7 @@
 # A definition for book service.
 # The book service uses user service and ab-testing service.
 version: 1
-services:
+dependencies:
   - name: 'user'
     lb: 'user:8080'
     connect_timeout_ms: 250
