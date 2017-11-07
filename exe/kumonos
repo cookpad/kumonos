@@ -16,15 +16,10 @@ class KumonosCli < Thor
   desc 'envoy', 'Generate envoy configuration'
   method_option :config, aliases: '-c', desc: 'Configuration file for kumonos', required: true, type: :string
   def envoy
-    validate_path!(options.fetch(:config))
-    h = JSON.parse(File.read(options.fetch(:config)))
-    result = Kumonos::Schemas.validate_kumonos_config(h)
-    unless result.empty?
-      warn("#{options[:config]} has invalid format:")
-      warn(result)
-      warn("A schema file for kumonos-configuration is #{Kumonos::Schemas::CONFIG_SCHEMA_PATH}")
-      exit 1
-    end
+    path = options.fetch(:config)
+    validate_path!(path)
+    h = JSON.parse(File.read(path))
+    validate_kumonos_config!(h, path)
 
     config = Kumonos::Configuration.from_hash(h)
     puts JSON.dump(Kumonos.generate(config))
@@ -87,13 +82,22 @@ class KumonosCli < Thor
     exit 1
   end
 
-  def validate_service_definition!(definition, filepath)
-    result = Kumonos::Schemas.validate_service_definition(definition)
+  def validate_kumonos_config!(h, path)
+    result = Kumonos::Schemas.validate_kumonos_config(h)
     return if result.empty?
+    warn_and_exit(result, path, Kumonos::Schemas::CONFIG_SCHEMA_PATH)
+  end
 
-    warn("#{filepath} has invalid format:")
+  def validate_service_definition!(h, path)
+    result = Kumonos::Schemas.validate_service_definition(h)
+    return if result.empty?
+    warn_and_exit(result, path, Kumonos::Schemas::SERVIVE_DEFINITION_PATH)
+  end
+
+  def warn_and_exit(result, path, schema_path)
+    warn("#{path} has invalid format:")
     warn(result)
-    warn("A schema file is #{Kumonos::Schemas::SERVIVE_DEFINITION_PATH}")
+    warn("The schema file is #{schema_path}")
     exit 1
   end
 end
