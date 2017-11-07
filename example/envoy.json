@@ -5,6 +5,7 @@
     "cluster": {
       "name": "nginx",
       "type": "strict_dns",
+      "tls": false,
       "connect_timeout_ms": 250,
       "lb_type": "round_robin",
       "hosts": [
@@ -18,6 +19,7 @@
     "name": "statsd",
     "connect_timeout_ms": 250,
     "type": "strict_dns",
+    "tls": false,
     "lb_type": "round_robin",
     "hosts": [
       {

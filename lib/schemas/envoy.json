@@ -35,6 +35,7 @@
           "required": [
             "name",
             "type",
+            "tls",
             "connect_timeout_ms",
             "lb_type",
             "hosts"
@@ -47,6 +48,10 @@
             "type": {
               "type": "string",
               "id": "/properties/ds/properties/cluster/properties/type"
+            },
+            "tls": {
+              "type": "boolean",
+              "id": "/properties/ds/properties/cluster/properties/tls"
             },
             "connect_timeout_ms": {
               "type": "integer",
@@ -86,6 +91,7 @@
         "name",
         "connect_timeout_ms",
         "type",
+        "tls",
         "lb_type",
         "hosts"
       ],
@@ -101,6 +107,10 @@
         "type": {
           "type": "string",
           "id": "/properties/statsd/properties/type"
+        },
+        "tls": {
+          "type": "boolean",
+          "id": "/properties/statsd/properties/tls"
         },
         "lb_type": {
           "type": "string",
