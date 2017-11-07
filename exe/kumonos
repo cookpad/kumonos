@@ -27,7 +27,9 @@ class KumonosCli < Thor
     definition = JSON.parse(File.read(File.expand_path('../example/envoy.json', __dir__)))
     definition.delete('statsd')
     cluster = definition.fetch('ds').fetch('cluster')
-    cluster['hosts'] = [{ url: 'tcp://your-load-balancer-to-discovery-service:443' }]
+    host = 'your-load-balancer-to-discovery-service'
+    cluster['name'] = host
+    cluster['hosts'] = [{ url: "tcp://#{host}:443" }]
     cluster['tls'] = true
     definition.fetch('ds')['cluster'] = cluster
     File.write(path, JSON.pretty_generate(definition) + "\n")
