@@ -5,7 +5,7 @@ module Kumonos
         new(
           h.fetch('version'),
           symbolize_keys(h.fetch('ds')),
-          symbolize_keys(h.fetch('statsd')),
+          symbolize_keys(h.fetch('statsd', {})),
           symbolize_keys(h.fetch('listener')),
           symbolize_keys(h.fetch('admin'))
         )

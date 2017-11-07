@@ -1,8 +1,9 @@
 RSpec.describe Kumonos::Envoy do
+  let(:definition_hash) do
+    JSON.parse(File.read(File.expand_path('../example/envoy.json', __dir__)))
+  end
   let(:definition) do
-    filename = File.expand_path('../example/envoy.json', __dir__)
-    h = JSON.parse(File.read(filename))
-    Kumonos::EnvoyDefinition.from_hash(h)
+    Kumonos::EnvoyDefinition.from_hash(definition_hash)
   end
 
   specify 'generate' do
@@ -65,5 +66,14 @@ RSpec.describe Kumonos::Envoy do
         }
       }
     )
+  end
+
+  specify '.generate without statsd' do
+    definition_hash.delete('statsd')
+    definition = Kumonos::EnvoyDefinition.from_hash(definition_hash)
+
+    out = Kumonos::Envoy.generate(definition)
+    expect(out).not_to have_key(:statsd_tcp_cluster_name)
+    expect(out[:cluster_manager][:clusters]).to be_empty
   end
 end
