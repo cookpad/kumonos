@@ -6,6 +6,7 @@ require 'kumonos/schemas'
 require 'kumonos/configuration'
 require 'kumonos/routes'
 require 'kumonos/clusters'
+require 'kumonos/output'
 
 # Kumonos
 module Kumonos

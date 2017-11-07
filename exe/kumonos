@@ -3,8 +3,6 @@
 
 $LOAD_PATH.unshift(File.expand_path('../lib', __dir__))
 require 'kumonos'
-
-require 'pathname'
 require 'thor'
 
 # KumonosCli
@@ -28,37 +26,31 @@ class KumonosCli < Thor
   desc 'clusters SERVIVE_DEFINITION_PATH', 'Generate clusters configuration'
   method_option :output, aliases: '-o', desc: 'Output directory', required: true, type: :string
   def clusters(filepath)
+    output_dir = options.fetch(:output)
     validate_path!(filepath)
-    validate_path!(options.fetch(:output))
+    validate_path!(output_dir)
 
     definition = YAML.load_file(filepath)
-    name = File.basename(filepath, '.*')
     validate_service_definition!(definition, filepath)
-    out = JSON.dump(Kumonos::Clusters.generate(definition))
+    json = JSON.dump(Kumonos::Clusters.generate(definition))
 
-    output_dir = Pathname.new(options.fetch(:output))
-    target = output_dir.join('v1', 'clusters', name, name)
-    target.parent.mkpath unless target.parent.exist?
-    target.write(out)
-    puts target
+    output = Kumonos::Output.new(output_dir, :clusters, File.basename(filepath, '.*'))
+    puts output.write(json)
   end
 
   desc 'routes SERVIVE_DEFINITION_PATH', 'Generate routes configuration'
   method_option :output, aliases: '-o', desc: 'Output directory', required: true, type: :string
   def routes(filepath)
+    output_dir = options.fetch(:output)
     validate_path!(filepath)
-    validate_path!(options.fetch(:output))
+    validate_path!(output_dir)
 
     definition = YAML.load_file(filepath)
-    name = File.basename(filepath, '.*')
     validate_service_definition!(definition, filepath)
-    out = JSON.dump(Kumonos::Routes.generate(definition))
+    json = JSON.dump(Kumonos::Routes.generate(definition))
 
-    output_dir = Pathname.new(options.fetch(:output))
-    target = output_dir.join('v1', 'routes', Kumonos::DEFAULT_ROUTE_NAME, name, name)
-    target.parent.mkpath unless target.parent.exist?
-    target.write(out)
-    puts target
+    output = Kumonos::Output.new(output_dir, :routes, File.basename(filepath, '.*'))
+    puts output.write(json)
   end
 
   desc 'init NAME', 'Generate a service definition'
