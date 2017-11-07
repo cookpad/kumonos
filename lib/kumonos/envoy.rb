@@ -17,7 +17,7 @@ module Kumonos
                   stat_prefix: 'ingress_http',
                   access_log: [{ path: definition.listener.fetch(:access_log_path) }],
                   rds: {
-                    cluster: definition.ds.fetch(:name),
+                    cluster: definition.ds.fetch(:cluster).fetch(:name),
                     route_config_name: DEFAULT_ROUTE_NAME,
                     refresh_delay_ms: definition.ds.fetch(:refresh_delay_ms)
                   },

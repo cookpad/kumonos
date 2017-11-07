@@ -3,11 +3,10 @@
   "$schema": "http://json-schema.org/draft-04/schema#",
   "type": "object",
   "id": "kumonos-configuration",
-  "additionalProperties": false,
+  "additionalProperties": true,
   "required": [
     "version",
     "ds",
-    "statsd",
     "listener",
     "admin"
   ],
@@ -21,15 +20,10 @@
       "id": "/properties/ds",
       "additionalProperties": false,
       "required": [
-        "name",
         "refresh_delay_ms",
         "cluster"
       ],
       "properties": {
-        "name": {
-          "type": "string",
-          "id": "/properties/ds/properties/name"
-        },
         "refresh_delay_ms": {
           "type": "integer",
           "id": "/properties/ds/properties/refresh_delay_ms"

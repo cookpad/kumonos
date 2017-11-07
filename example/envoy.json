@@ -1,7 +1,6 @@
 {
   "version": 1,
   "ds": {
-    "name": "nginx",
     "refresh_delay_ms": 30000,
     "cluster": {
       "name": "nginx",
