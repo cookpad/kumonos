@@ -1,5 +1,5 @@
 module Kumonos
-  Configuration = Struct.new(:version, :ds, :statsd, :listener, :admin) do
+  EnvoyDefinition = Struct.new(:version, :ds, :statsd, :listener, :admin) do
     class << self
       def from_hash(h)
         new(

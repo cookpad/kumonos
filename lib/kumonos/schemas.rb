@@ -5,12 +5,12 @@ module Kumonos
   # Schemas
   module Schemas
     ROOT = Pathname.new(File.expand_path('../schemas', __dir__))
-    CONFIG_SCHEMA_PATH = ROOT.join('kumonos_config.json')
+    ENVOY_SCHEMA_PATH = ROOT.join('envoy.json')
     SERVIVE_DEFINITION_PATH = ROOT.join('service_definition.json')
 
     class << self
-      def validate_kumonos_config(hash)
-        schema = load_schema(CONFIG_SCHEMA_PATH)
+      def validate_envoy_definition(hash)
+        schema = load_schema(ENVOY_SCHEMA_PATH)
         JSON::Validator.fully_validate(schema, hash)
       end
 

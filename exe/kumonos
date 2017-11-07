@@ -11,19 +11,17 @@ class KumonosCli < Thor
     true
   end
 
-  desc 'envoy', 'Generate envoy configuration'
-  method_option :config, aliases: '-c', desc: 'Configuration file for kumonos', required: true, type: :string
-  def envoy
-    path = options.fetch(:config)
+  desc 'envoy ENVOY_DEFINITION', 'Generate envoy configuration'
+  def envoy(path)
     validate_path!(path)
     h = JSON.parse(File.read(path))
-    validate_kumonos_config!(h, path)
+    validate_envoy_definition!(h, path)
 
-    config = Kumonos::Configuration.from_hash(h)
-    puts JSON.dump(Kumonos.generate(config))
+    definition = Kumonos::EnvoyDefinition.from_hash(h)
+    puts JSON.dump(Kumonos::Envoy.generate(definition))
   end
 
-  desc 'clusters SERVIVE_DEFINITION_PATH', 'Generate clusters configuration'
+  desc 'clusters SERVIVE_DEFINITION', 'Generate clusters configuration'
   method_option :output, aliases: '-o', desc: 'Output directory', required: true, type: :string
   def clusters(filepath)
     output_dir = options.fetch(:output)
@@ -38,7 +36,7 @@ class KumonosCli < Thor
     puts output.write(json)
   end
 
-  desc 'routes SERVIVE_DEFINITION_PATH', 'Generate routes configuration'
+  desc 'routes SERVIVE_DEFINITION', 'Generate routes configuration'
   method_option :output, aliases: '-o', desc: 'Output directory', required: true, type: :string
   def routes(filepath)
     output_dir = options.fetch(:output)
@@ -74,10 +72,10 @@ class KumonosCli < Thor
     exit 1
   end
 
-  def validate_kumonos_config!(h, path)
-    result = Kumonos::Schemas.validate_kumonos_config(h)
+  def validate_envoy_definition!(h, path)
+    result = Kumonos::Schemas.validate_envoy_definition(h)
     return if result.empty?
-    warn_and_exit(result, path, Kumonos::Schemas::CONFIG_SCHEMA_PATH)
+    warn_and_exit(result, path, Kumonos::Schemas::ENVOY_SCHEMA_PATH)
   end
 
   def validate_service_definition!(h, path)

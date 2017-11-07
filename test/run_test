@@ -2,7 +2,7 @@
 set -ex
 
 docker-compose down
-../exe/kumonos envoy -c ../example/kumonos.json > config.json
+../exe/kumonos envoy ../example/envoy.json > config.json
 rm -rf srv
 mkdir srv
 ../exe/kumonos clusters -o srv ../example/book.yml
