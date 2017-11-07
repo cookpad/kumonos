@@ -13,3 +13,4 @@
 Gemfile.lock
 test/config.json
 test/srv
+envoy.json

@@ -3,10 +3,10 @@
   "ds": {
     "refresh_delay_ms": 30000,
     "cluster": {
-      "name": "nginx",
+      "name": "ds",
       "type": "strict_dns",
       "tls": false,
-      "connect_timeout_ms": 250,
+      "connect_timeout_ms": 1000,
       "lb_type": "round_robin",
       "hosts": [
         {
@@ -17,7 +17,7 @@
   },
   "statsd": {
     "name": "statsd",
-    "connect_timeout_ms": 250,
+    "connect_timeout_ms": 1000,
     "type": "strict_dns",
     "tls": false,
     "lb_type": "round_robin",

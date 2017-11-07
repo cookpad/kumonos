@@ -21,7 +21,7 @@ RSpec.describe Kumonos::Envoy do
                 stat_prefix: 'ingress_http',
                 access_log: [{ path: '/dev/stdout' }],
                 rds: {
-                  cluster: 'nginx',
+                  cluster: 'ds',
                   route_config_name: 'default',
                   refresh_delay_ms: 30_000
                 },
@@ -46,7 +46,7 @@ RSpec.describe Kumonos::Envoy do
         clusters: [
           {
             name: 'statsd',
-            connect_timeout_ms: 250,
+            connect_timeout_ms: 1_000,
             type: 'strict_dns',
             lb_type: 'round_robin',
             hosts: [{ url: 'tcp://socat:2000' }]
@@ -54,9 +54,9 @@ RSpec.describe Kumonos::Envoy do
         ],
         cds: {
           cluster: {
-            name: 'nginx',
+            name: 'ds',
             type: 'strict_dns',
-            connect_timeout_ms: 250,
+            connect_timeout_ms: 1_000,
             lb_type: 'round_robin',
             hosts: [
               { url: 'tcp://nginx:80' }
