@@ -8,9 +8,9 @@
 /tmp/
 
 # rspec failure tracking
-.rspec_status
+/.rspec_status
 
-Gemfile.lock
-test/config.json
-test/srv
-envoy.json
+/Gemfile.lock
+/test/config.json
+/test/srv
+/envoy.json
