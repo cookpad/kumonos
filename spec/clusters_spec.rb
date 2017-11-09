@@ -13,7 +13,7 @@ RSpec.describe Kumonos::Clusters do
           connect_timeout_ms: 250,
           type: 'strict_dns',
           lb_type: 'round_robin',
-          hosts: [{ url: 'tcp://user:8080' }],
+          hosts: [{ url: 'tcp://user-app:8080' }],
           circuit_breakers: {
             default: {
               max_connections: 64,
@@ -27,7 +27,7 @@ RSpec.describe Kumonos::Clusters do
           connect_timeout_ms: 250,
           type: 'strict_dns',
           lb_type: 'round_robin',
-          hosts: [{ url: 'tcp://ab-testing:8080' }],
+          hosts: [{ url: 'tcp://ab-testing-app:8080' }],
           circuit_breakers: {
             default: {
               max_connections: 64,

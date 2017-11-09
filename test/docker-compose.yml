@@ -1,6 +1,6 @@
 version: '3'
 services:
-  user:
+  user-app:
     build: 'app'
     environment:
       RESPONSE: 'user'
@@ -8,7 +8,7 @@ services:
       ERROR_RATE: 5
     expose:
       - '8080'
-  ab-testing:
+  ab-testing-app:
     build: 'app'
     environment:
       RESPONSE: 'ab-testing'
@@ -29,8 +29,8 @@ services:
   envoy:
     image: 'envoyproxy/envoy:3213ef0ddef11f3dfee0883333050844a297cc5d'
     depends_on:
-      - 'user'
-      - 'ab-testing'
+      - 'user-app'
+      - 'ab-testing-app'
       - 'nginx'
       - 'socat'
     command:

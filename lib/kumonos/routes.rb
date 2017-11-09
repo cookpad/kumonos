@@ -25,6 +25,7 @@ module Kumonos
         base = {
           prefix: route['prefix'],
           timeout_ms: route['timeout_ms'],
+          auto_host_rewrite: true,
           cluster: name
         }
         with_retry = base.merge(
