@@ -27,7 +27,7 @@ services:
     image: 'alpine/socat'
     command: ['TCP4-LISTEN:2000,fork,reuseaddr', 'STDOUT']
   envoy:
-    image: 'lyft/envoy:d70404f7e5c89ab2c5fab72b516e2bf601969557'
+    image: 'envoyproxy/envoy:3213ef0ddef11f3dfee0883333050844a297cc5d'
     depends_on:
       - 'user'
       - 'ab-testing'
