@@ -3,7 +3,7 @@
 version: 1
 dependencies:
   - name: 'user'
-    lb: 'user:8080'
+    lb: 'user-app:8080'
     tls: false
     connect_timeout_ms: 250
     circuit_breaker:
@@ -18,7 +18,7 @@ dependencies:
           num_retries: 3
           per_try_timeout_ms: 1000
   - name: 'ab-testing'
-    lb: 'ab-testing:8080'
+    lb: 'ab-testing-app:8080'
     tls: false
     connect_timeout_ms: 250
     circuit_breaker:
