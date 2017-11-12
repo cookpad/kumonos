@@ -1,5 +1,7 @@
 require 'net/http'
 require 'uri'
+require 'json'
+require 'rack'
 
 def raise_error
   raise('invalid response')
@@ -19,7 +21,23 @@ Net::HTTP.start(envoy_url.host, envoy_url.port) do |http|
   raise_error if response.body != 'GET,ab-testing-app,ab-testing'
 
   puts 'pass'
-  break
+end
+
+if ENV['TEST_WITH_RELAY'] == '1'
+  puts 'waiting 30s till metrics to be sent...'
+  sleep 30
+  prometheus_url = URI('http://localhost:9090')
+  Net::HTTP.start(prometheus_url.host, prometheus_url.port) do |http|
+    query = Rack::Utils.build_query(query: 'sum(envoy_cluster_upstream_rq_200_counter{cluster!="ds"}) by (cluster)')
+    response = http.get("/api/v1/query?#{query}")
+    p response, response.body
+    raise_error if response.code != '200'
+    result = JSON.parse(response.body)
+    p result
+    raise_error unless result['data']['result'].size == 2
+
+    puts 'pass relay test'
+  end
 end
 
 puts 'OK'
