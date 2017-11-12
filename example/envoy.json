@@ -23,7 +23,7 @@
     "lb_type": "round_robin",
     "hosts": [
       {
-        "url": "tcp://socat:2000"
+        "url": "tcp://relay:2000"
       }
     ]
   },
