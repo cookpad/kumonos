@@ -23,16 +23,45 @@ services:
       - './srv:/srv'
     ports:
       - '3080:80'
-  socat:
-    image: 'alpine/socat'
-    command: ['TCP4-LISTEN:2000,fork,reuseaddr', 'STDOUT']
+  grafana:
+    image: 'grafana/grafana'
+    ports:
+      - '3000:3000'
+    depends_on:
+      - 'prometheus'
+  prometheus:
+    image: 'prom/prometheus'
+    ports:
+      - '9090:9090'
+    depends_on:
+      - 'statsd-exporter'
+    volumes:
+      - './prometheus.yml:/etc/prometheus/prometheus.yml'
+  statsd-exporter:
+    image: 'prom/statsd-exporter'
+    ports:
+      - '9102:9102'
+  relay:
+    build: '..'
+    depends_on:
+      - 'statsd-exporter'
+    environment:
+      APP_ID: 'test'
+    command:
+      - "bundle"
+      - "exec"
+      - "./exe/kumonos-relay"
+      - "--service-cluster=test"
+      - "--service-node=test"
+      - "0.0.0.0:2000"
+      - "statsd-exporter:9125"
   envoy:
     image: 'envoyproxy/envoy:3213ef0ddef11f3dfee0883333050844a297cc5d'
     depends_on:
       - 'user-app'
       - 'ab-testing-app'
       - 'nginx'
-      - 'socat'
+      - 'relay'
     command:
       - 'envoy'
       - '-c'

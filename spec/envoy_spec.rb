@@ -49,7 +49,7 @@ RSpec.describe Kumonos::Envoy do
             connect_timeout_ms: 1_000,
             type: 'strict_dns',
             lb_type: 'round_robin',
-            hosts: [{ url: 'tcp://socat:2000' }]
+            hosts: [{ url: 'tcp://relay:2000' }]
           }
         ],
         cds: {
