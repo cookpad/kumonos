@@ -10,19 +10,34 @@ class StatConvertor
   end
 
   def call(line)
-    convert_cluster(add_default_tag(line)) + "\n"
+    convert_listener(convert_cluster(add_default_tag(line))) + "\n"
   end
 
   private
 
-  # envoy.cluster.ab-testing.external.upstream_rq_200
-  PATTERN = /\Aenvoy\.cluster\.([^.]+)\./
+  # envoy.cluster.ab-testing.external.upstream_rq_200:1|c
+  CLUSTER_PATTERN = /\Aenvoy\.cluster\.([^.]+)\./
   def convert_cluster(line)
-    if line.match(PATTERN)
+    if line.match(CLUSTER_PATTERN)
       name = Regexp.last_match(1)
       [
-        line.gsub(PATTERN, 'envoy.cluster.'),
+        line.gsub(CLUSTER_PATTERN, 'envoy.cluster.'),
         ",cluster:#{name}"
+      ].join
+    else
+      line
+    end
+  end
+
+  # XXX: ipv4 only
+  # envoy.listener.0.0.0.0_9211.http.ingress_http.downstream_rq_5xx:0|c
+  LISTENER_PATTERN = /\Aenvoy\.listener\.(\d+\.\d+\.\d+.\d+_\d+)./
+  def convert_listener(line)
+    if line.match(LISTENER_PATTERN)
+      listener = Regexp.last_match(1)
+      [
+        line.gsub(LISTENER_PATTERN, 'envoy.listener.'),
+        ",listener:#{listener}"
       ].join
     else
       line
