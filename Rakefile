@@ -15,5 +15,14 @@ task :integration_test do
   end
 end
 
+desc 'Run full integration test'
+task :full_integration_test do
+  ENV['TEST_WITH_RELAY'] = '1'
+  Rake::Task['integration_test'].invoke
+end
+
 desc 'Run all tests'
 task all: %i[spec rubocop integration_test]
+
+desc 'Run all tests including slow ones'
+task full: %i[spec rubocop full_integration_test]
