@@ -3,7 +3,6 @@ require 'yaml'
 
 require 'kumonos/version'
 require 'kumonos/schemas'
-require 'kumonos/envoy_definition'
 require 'kumonos/envoy'
 require 'kumonos/routes'
 require 'kumonos/clusters'

@@ -14,10 +14,8 @@ class KumonosCli < Thor
   desc 'envoy ENVOY_DEFINITION', 'Generate envoy configuration'
   def envoy(path)
     validate_path!(path)
-    h = JSON.parse(File.read(path))
-    validate_envoy_definition!(h, path)
-
-    definition = Kumonos::EnvoyDefinition.from_hash(h)
+    definition = JSON.parse(File.read(path))
+    validate_envoy_definition!(definition, path)
     puts JSON.dump(Kumonos::Envoy.generate(definition))
   end
 
