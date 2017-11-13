@@ -5,34 +5,54 @@ module Kumonos
       def generate(definition)
         {
           validate_clusters: false,
-          virtual_hosts: definition['dependencies'].map { |s| service_to_vhost(s) }
+          virtual_hosts: definition['dependencies'].map { |s| Vhost.build(s).to_h }
         }
       end
+    end
 
-      private
-
-      def service_to_vhost(service)
-        name = service['name']
-        {
-          name: name,
-          domains: [name],
-          routes: service['routes'].flat_map { |r| split_route(r, name) }
-        }
+    Vhost = Struct.new(:name, :domains, :routes) do
+      class << self
+        def build(h)
+          name = h.fetch('name')
+          routes = h.fetch('routes').map { |r| Route.build(r, name) }
+          new(name, [name], routes)
+        end
       end
 
-      # Split route definition to apply retry definition only to GET/HEAD requests.
-      def split_route(route, name)
-        base = {
-          prefix: route['prefix'],
-          timeout_ms: route['timeout_ms'],
-          auto_host_rewrite: true,
-          cluster: name
-        }
-        with_retry = base.merge(
-          retry_policy: route['retry_policy'],
-          headers: [{ name: ':method', value: '(GET|HEAD)', regex: true }]
-        )
-        [with_retry, base]
+      def to_h
+        h = super
+        h[:routes] = routes.flat_map { |r| [r.to_h_with_retry, r.to_h] }
+        h
+      end
+    end
+
+    Route = Struct.new(:prefix, :cluster, :timeout_ms, :retry_policy) do
+      class << self
+        def build(h, cluster)
+          new(h.fetch('prefix'), cluster, h.fetch('timeout_ms'), RetryPolicy.build(h.fetch('retry_policy')))
+        end
+      end
+
+      def to_h
+        h = super
+        h.delete(:retry_policy)
+        h[:auto_host_rewrite] = true
+        h
+      end
+
+      def to_h_with_retry
+        h = to_h
+        h[:retry_policy] = retry_policy.to_h
+        h[:headers] = [{ name: ':method', value: '(GET|HEAD)', regex: true }]
+        h
+      end
+    end
+
+    RetryPolicy = Struct.new(:retry_on, :num_retries, :per_try_timeout_ms) do
+      class << self
+        def build(h)
+          new(h.fetch('retry_on'), h.fetch('num_retries'), h.fetch('per_try_timeout_ms'))
+        end
       end
     end
   end
