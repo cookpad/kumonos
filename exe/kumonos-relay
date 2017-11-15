@@ -30,7 +30,7 @@ class StatConvertor
   end
 
   # XXX: ipv4 only
-  # envoy.listener.0.0.0.0_9211.http.ingress_http.downstream_rq_5xx:0|c
+  # envoy.listener.0.0.0.0_9211.http.egress_http.downstream_rq_5xx:0|c
   LISTENER_PATTERN = /\Aenvoy\.listener\.(\d+\.\d+\.\d+.\d+_\d+)./
   def convert_listener(line)
     if line.match(LISTENER_PATTERN)
