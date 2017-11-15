@@ -22,7 +22,7 @@ class StatConvertor
       code = Regexp.last_match(2)
       [
         line.gsub(STATS_CODE_PATTERN, "#{stream}_rq_by_code"),
-        ",statu_code:#{code}"
+        ",status_code:#{code}"
       ].join
 
     else
