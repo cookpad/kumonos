@@ -10,10 +10,25 @@ class StatConvertor
   end
 
   def call(line)
-    convert_listener(convert_cluster(add_default_tag(line))) + "\n"
+    convert_status_code(convert_listener(convert_cluster(add_default_tag(line)))) + "\n"
   end
 
   private
+
+  STATS_CODE_PATTERN = /(upstream|downstream)_rq_(\dxx|\d{3})/
+  def convert_status_code(line)
+    if line.match(STATS_CODE_PATTERN)
+      stream = Regexp.last_match(1)
+      code = Regexp.last_match(2)
+      [
+        line.gsub(STATS_CODE_PATTERN, "#{stream}_rq_by_code"),
+        ",statu_code:#{code}"
+      ].join
+
+    else
+      line
+    end
+  end
 
   # envoy.cluster.ab-testing.external.upstream_rq_200:1|c
   CLUSTER_PATTERN = /\Aenvoy\.cluster\.([^.]+)\./
