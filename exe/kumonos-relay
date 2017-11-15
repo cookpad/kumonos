@@ -47,8 +47,8 @@ class StatConvertor
   def add_default_tag(line)
     [
       "#{line.chomp}|#",
-      "service-cluster:#{@options[:service_cluster]},",
-      "service-node:#{@options[:service_node]},",
+      "service_cluster:#{@options[:service_cluster]},",
+      "service_node:#{@options[:service_node]},",
       "host:#{@options[:host]}"
     ].join
   end
