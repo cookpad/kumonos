@@ -15,7 +15,7 @@ RSpec.describe Kumonos::Envoy do
               name: 'http_connection_manager',
               config: {
                 codec_type: 'auto',
-                stat_prefix: 'ingress_http',
+                stat_prefix: 'egress_http',
                 access_log: [{ path: '/dev/stdout' }],
                 rds: {
                   cluster: 'ds',

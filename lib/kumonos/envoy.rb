@@ -57,7 +57,7 @@ module Kumonos
             name: 'http_connection_manager',
             config: {
               codec_type: 'auto',
-              stat_prefix: 'ingress_http',
+              stat_prefix: 'egress_http',
               access_log: [{ path: access_log_path }],
               rds: {
                 cluster: ds.cluster.name,
