@@ -95,11 +95,8 @@ module Kumonos
 
       def to_h
         h = super
-        if tls
-          h[:ssl_context] = {}
-        else
-          h.delete(:tls)
-        end
+        h.delete(:tls)
+        h[:ssl_context] = {} if tls
         h
       end
     end

@@ -65,6 +65,22 @@ RSpec.describe Kumonos::Envoy do
     )
   end
 
+  specify '.generate with ds with TLS' do
+    definition['ds']['cluster']['tls'] = true
+    out = Kumonos::Envoy.generate(definition)
+    ds_cluster = out.fetch(:cluster_manager).fetch(:cds).fetch(:cluster)
+    expect(JSON.dump(ds_cluster)).to be_json_as(
+      name: 'ds',
+      type: 'strict_dns',
+      ssl_context: {},
+      connect_timeout_ms: 1_000,
+      lb_type: 'round_robin',
+      hosts: [
+        { url: 'tcp://nginx:80' }
+      ]
+    )
+  end
+
   specify '.generate without statsd' do
     definition.delete('statsd')
     out = Kumonos::Envoy.generate(definition)
