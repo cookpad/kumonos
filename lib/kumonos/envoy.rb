@@ -96,7 +96,7 @@ module Kumonos
       def to_h
         h = super
         if tls
-          cluster[:ssl_context] = {}
+          h[:ssl_context] = {}
         else
           h.delete(:tls)
         end
