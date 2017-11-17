@@ -19,8 +19,8 @@ services:
   nginx:
     image: 'nginx'
     volumes:
-      - './nginx.conf:/etc/nginx/nginx.conf'
-      - './srv:/srv'
+      - './nginx.conf:/etc/nginx/nginx.conf:ro'
+      - './srv:/srv:ro'
     ports:
       - '3080:80'
   grafana:
@@ -36,7 +36,7 @@ services:
     depends_on:
       - 'statsd-exporter'
     volumes:
-      - './prometheus.yml:/etc/prometheus/prometheus.yml'
+      - './prometheus.yml:/etc/prometheus/prometheus.yml:ro'
   statsd-exporter:
     image: 'prom/statsd-exporter'
     ports:
@@ -71,7 +71,7 @@ services:
       - '--service-node'
       - 'book'
     volumes:
-      - './config.json:/config.json'
+      - './config.json:/config.json:ro'
     expose:
       - '9211' # service port
       - '9901' # admin port
