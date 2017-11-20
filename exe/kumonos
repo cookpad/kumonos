@@ -21,21 +21,6 @@ class KumonosCli < Thor
     File.write(options.fetch(:output), JSON.dump(Kumonos::Envoy.generate(definition)))
   end
 
-  desc 'init_envoy', 'Generate envoy definition'
-  def init_envoy
-    path = 'envoy.json'
-    definition = JSON.parse(File.read(File.expand_path('../example/envoy.json', __dir__)))
-    definition.delete('statsd')
-    cluster = definition.fetch('ds').fetch('cluster')
-    host = 'your-load-balancer-to-discovery-service'
-    cluster['name'] = host
-    cluster['hosts'] = [{ url: "tcp://#{host}:443" }]
-    cluster['tls'] = true
-    definition.fetch('ds')['cluster'] = cluster
-    File.write(path, JSON.pretty_generate(definition) + "\n")
-    puts path
-  end
-
   desc 'clusters SERVIVE_DEFINITION', 'Generate clusters configuration'
   method_option :output, aliases: '-o', desc: 'Output directory', required: true, type: :string
   def clusters(filepath)
