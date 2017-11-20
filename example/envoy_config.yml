@@ -1,0 +1,17 @@
+version: 1
+listener:
+  address: tcp://0.0.0.0:9211
+  access_log_path: /dev/stdout
+admin:
+  address: tcp://0.0.0.0:9901
+  access_log_path: /dev/stdout
+discovery_service:
+  lb: nginx:80
+  tls: false
+  refresh_delay_ms: 30000
+  connect_timeout_ms: 1000
+statsd:
+  address: relay:2000
+  tls: false
+  type: strict_dns
+  connect_timeout_ms: 1000

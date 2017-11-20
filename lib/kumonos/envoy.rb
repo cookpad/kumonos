@@ -7,16 +7,29 @@ module Kumonos
       end
     end
 
-    EnvoyConfig = Struct.new(:version, :ds, :statsd, :listener, :admin) do
+    EnvoyConfig = Struct.new(:version, :discovery_service, :statsd, :listener, :admin) do
       class << self
         def build(h)
-          ds = DiscoverService.build(h.fetch('ds'))
+          discovery_service = DiscoverService.build(h.fetch('discovery_service'))
           new(
             h.fetch('version'),
-            ds,
-            h['statsd'] ? Cluster.build(h['statsd']) : nil,
-            Listener.build(h.fetch('listener'), ds),
+            discovery_service,
+            h['statsd'] ? build_statsd_cluster(h['statsd']) : nil,
+            Listener.build(h.fetch('listener'), discovery_service),
             Admin.build(h.fetch('admin'))
+          )
+        end
+
+        private
+
+        def build_statsd_cluster(h)
+          Cluster.new(
+            'statsd',
+            h.fetch('type'),
+            h.fetch('tls'),
+            h.fetch('connect_timeout_ms'),
+            'round_robin',
+            [{ 'url' => "tcp://#{h.fetch('address')}" }]
           )
         end
       end
@@ -24,12 +37,12 @@ module Kumonos
       def to_h
         h = super
         h.delete(:version)
-        h.delete(:ds)
+        h.delete(:discovery_service)
         h.delete(:statsd)
         h.delete(:listener)
         h[:admin] = admin.to_h
         h[:listeners] = [listener.to_h]
-        h[:cluster_manager] = { cds: ds.to_h, clusters: [] }
+        h[:cluster_manager] = { cds: discovery_service.to_h, clusters: [] }
 
         if statsd
           h[:statsd_tcp_cluster_name] = statsd.name
@@ -40,16 +53,16 @@ module Kumonos
       end
     end
 
-    Listener = Struct.new(:address, :access_log_path, :ds) do
+    Listener = Struct.new(:address, :access_log_path, :discovery_service) do
       class << self
-        def build(h, ds)
-          new(h.fetch('address'), h.fetch('access_log_path'), ds)
+        def build(h, discovery_service)
+          new(h.fetch('address'), h.fetch('access_log_path'), discovery_service)
         end
       end
 
       def to_h
         h = super
-        h.delete(:ds)
+        h.delete(:discovery_service)
         h.delete(:access_log_path)
         h[:filters] = [
           {
@@ -60,9 +73,9 @@ module Kumonos
               stat_prefix: 'egress_http',
               access_log: [{ path: access_log_path }],
               rds: {
-                cluster: ds.cluster.name,
+                cluster: discovery_service.cluster.name,
                 route_config_name: DEFAULT_ROUTE_NAME,
-                refresh_delay_ms: ds.refresh_delay_ms
+                refresh_delay_ms: discovery_service.refresh_delay_ms
               },
               filters: [{ type: 'decoder', name: 'router', config: {} }]
             }
@@ -75,7 +88,15 @@ module Kumonos
     DiscoverService = Struct.new(:refresh_delay_ms, :cluster) do
       class << self
         def build(h)
-          new(h.fetch('refresh_delay_ms'), Cluster.build(h.fetch('cluster')))
+          cluster = Cluster.new(
+            'discovery_service',
+            'strict_dns',
+            h.fetch('tls'),
+            h.fetch('connect_timeout_ms'),
+            'round_robin',
+            [{ 'url' => "tcp://#{h.fetch('lb')}" }]
+          )
+          new(h.fetch('refresh_delay_ms'), cluster)
         end
       end
 
