@@ -1,6 +1,6 @@
 RSpec.describe Kumonos::Envoy do
   let(:definition) do
-    JSON.parse(File.read(File.expand_path('../example/envoy.json', __dir__)))
+    YAML.load_file(File.expand_path('../example/envoy_config.yml', __dir__))
   end
 
   specify 'generate' do
@@ -18,7 +18,7 @@ RSpec.describe Kumonos::Envoy do
                 stat_prefix: 'egress_http',
                 access_log: [{ path: '/dev/stdout' }],
                 rds: {
-                  cluster: 'ds',
+                  cluster: 'discovery_service',
                   route_config_name: 'default',
                   refresh_delay_ms: 30_000
                 },
@@ -51,7 +51,7 @@ RSpec.describe Kumonos::Envoy do
         ],
         cds: {
           cluster: {
-            name: 'ds',
+            name: 'discovery_service',
             type: 'strict_dns',
             connect_timeout_ms: 1_000,
             lb_type: 'round_robin',
@@ -66,11 +66,11 @@ RSpec.describe Kumonos::Envoy do
   end
 
   specify '.generate with ds with TLS' do
-    definition['ds']['cluster']['tls'] = true
+    definition['discovery_service']['tls'] = true
     out = Kumonos::Envoy.generate(definition)
     ds_cluster = out.fetch(:cluster_manager).fetch(:cds).fetch(:cluster)
     expect(JSON.dump(ds_cluster)).to be_json_as(
-      name: 'ds',
+      name: 'discovery_service',
       type: 'strict_dns',
       ssl_context: {},
       connect_timeout_ms: 1_000,
