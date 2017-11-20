@@ -12,11 +12,13 @@ class KumonosCli < Thor
   end
 
   desc 'envoy ENVOY_DEFINITION', 'Generate envoy configuration'
+  method_option :output, aliases: '-o', desc: 'Output path', required: true, type: :string
   def envoy(path)
     validate_path!(path)
     definition = YAML.load_file(path)
     validate_envoy_definition!(definition, path)
-    puts JSON.dump(Kumonos::Envoy.generate(definition))
+
+    File.write(options.fetch(:output), JSON.dump(Kumonos::Envoy.generate(definition)))
   end
 
   desc 'init_envoy', 'Generate envoy definition'
