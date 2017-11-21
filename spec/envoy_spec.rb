@@ -18,7 +18,7 @@ RSpec.describe Kumonos::Envoy do
                 stat_prefix: 'egress_http',
                 access_log: [{ path: '/dev/stdout' }],
                 rds: {
-                  cluster: 'discovery_service',
+                  cluster: 'nginx',
                   route_config_name: 'default',
                   refresh_delay_ms: 30_000
                 },
@@ -51,7 +51,7 @@ RSpec.describe Kumonos::Envoy do
         ],
         cds: {
           cluster: {
-            name: 'discovery_service',
+            name: 'nginx',
             type: 'strict_dns',
             connect_timeout_ms: 1_000,
             lb_type: 'round_robin',
@@ -70,7 +70,7 @@ RSpec.describe Kumonos::Envoy do
     out = Kumonos::Envoy.generate(definition)
     ds_cluster = out.fetch(:cluster_manager).fetch(:cds).fetch(:cluster)
     expect(JSON.dump(ds_cluster)).to be_json_as(
-      name: 'discovery_service',
+      name: 'nginx',
       type: 'strict_dns',
       ssl_context: {},
       connect_timeout_ms: 1_000,
