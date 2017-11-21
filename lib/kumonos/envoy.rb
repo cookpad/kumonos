@@ -88,13 +88,14 @@ module Kumonos
     DiscoverService = Struct.new(:refresh_delay_ms, :cluster) do
       class << self
         def build(h)
+          lb = h.fetch('lb')
           cluster = Cluster.new(
-            'discovery_service',
+            lb.split(':').first,
             'strict_dns',
             h.fetch('tls'),
             h.fetch('connect_timeout_ms'),
             'round_robin',
-            [{ 'url' => "tcp://#{h.fetch('lb')}" }]
+            [{ 'url' => "tcp://#{lb}" }]
           )
           new(h.fetch('refresh_delay_ms'), cluster)
         end
