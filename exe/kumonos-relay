@@ -70,6 +70,7 @@ class StatConvertor
 end
 
 logger = Logger.new($stderr)
+logger.level = ENV['LOG_LEVEL'] || 'info'
 
 options = {
   service_cluster: '',
@@ -120,13 +121,13 @@ source = TCPServer.open(source_ip, source_port)
 loop do
   Thread.start(source.accept) do |s|
     while (body = s.gets)
-      logger.info("recieved #{body.bytesize} bytes")
+      logger.debug("recieved #{body.bytesize} bytes")
       logger.debug(body)
       next if body.empty?
 
       b = convertor.call(body)
       UDPSocket.new.send(b, Socket::MSG_DONTWAIT, remote_ip, remote_port)
-      logger.info("write #{b.bytesize} bytes")
+      logger.debug("write #{b.bytesize} bytes")
       logger.debug(b)
     end
     s.close
