@@ -47,7 +47,7 @@ if ENV['TEST_WITH_RELAY'] == '1'
   sleep 3
   prometheus_url = URI('http://localhost:9090')
   Net::HTTP.start(prometheus_url.host, prometheus_url.port) do |http|
-    query = Rack::Utils.build_query(query: 'sum(envoy_cluster_upstream_rq_by_code_counter{cluster!="discovery_service"}) by (cluster)')
+    query = Rack::Utils.build_query(query: 'sum(envoy_cluster_upstream_rq_by_code{cluster!="nginx"}) by (cluster)')
 
     catch(:break) do
       i = 0
