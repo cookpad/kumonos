@@ -1,4 +1,4 @@
-FROM envoyproxy/envoy:5d14c9fc9bb9233656e544cd4e69e5397f98eca9
+FROM envoyproxy/envoy:3122ee8361a3c339c906554f1bb56f68a8e692a9
 
 RUN apt-get update && apt-get install -y software-properties-common curl
 RUN apt-add-repository ppa:brightbox/ruby-ng

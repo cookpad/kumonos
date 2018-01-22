@@ -67,6 +67,26 @@ if ENV['TEST_WITH_RELAY'] == '1'
       end
     end
 
+    query = Rack::Utils.build_query(query: 'envoy_server_live{service_cluster="test-cluster"}')
+
+    catch(:break) do
+      i = 0
+      loop do
+        response = http.get("/api/v1/query?#{query}")
+        p response, response.body
+        raise_error(response) if response.code != '200'
+        result = JSON.parse(response.body)
+        if result['data']['result'].size == 1
+          throw(:break)
+        else
+          raise_error(response) if i > 17
+          puts 'waiting envoy stats to be sent...'
+          sleep((2 * i) / 10.0)
+          i += 1
+        end
+      end
+    end
+
     puts 'pass stats tag test'
   end
 end

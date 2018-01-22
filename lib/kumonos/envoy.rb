@@ -2,21 +2,23 @@ module Kumonos
   # Generate envoy configuration.
   module Envoy
     class << self
-      def generate(definition)
-        EnvoyConfig.build(definition).to_h
+      def generate(definition, cluster:, node:)
+        EnvoyConfig.build(definition, cluster: cluster, node: node).to_h
       end
     end
 
-    EnvoyConfig = Struct.new(:version, :discovery_service, :statsd, :listener, :admin) do
+    EnvoyConfig = Struct.new(:version, :discovery_service, :statsd, :listener, :admin, :cluster, :node) do
       class << self
-        def build(h)
+        def build(h, cluster:, node:)
           discovery_service = DiscoverService.build(h.fetch('discovery_service'))
           new(
             h.fetch('version'),
             discovery_service,
             h['statsd'] ? h['statsd'].fetch('address') : nil,
             Listener.build(h.fetch('listener'), discovery_service),
-            Admin.build(h.fetch('admin'))
+            Admin.build(h.fetch('admin')),
+            cluster,
+            node
           )
         end
 
@@ -40,6 +42,8 @@ module Kumonos
         h.delete(:discovery_service)
         h.delete(:statsd)
         h.delete(:listener)
+        h.delete(:cluster)
+        h.delete(:node)
         h[:admin] = admin.to_h
         h[:static_resources] = {
           listeners: [listener.to_h],
@@ -74,7 +78,10 @@ module Kumonos
           ]
           h[:stats_config] = {
             use_all_default_tags: true,
-            stats_tags: []
+            stats_tags: [
+              { tag_name: 'service-cluster', fixed_value: cluster },
+              { tag_name: 'service-node', fixed_value: node }
+            ]
           }
         end
 
