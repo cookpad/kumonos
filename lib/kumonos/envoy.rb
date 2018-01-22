@@ -14,7 +14,7 @@ module Kumonos
           new(
             h.fetch('version'),
             discovery_service,
-            h['statsd'] ? build_statsd_cluster(h['statsd']) : nil,
+            h['statsd'] ? h['statsd'].fetch('address') : nil,
             Listener.build(h.fetch('listener'), discovery_service),
             Admin.build(h.fetch('admin'))
           )
@@ -41,12 +41,41 @@ module Kumonos
         h.delete(:statsd)
         h.delete(:listener)
         h[:admin] = admin.to_h
-        h[:listeners] = [listener.to_h]
-        h[:cluster_manager] = { cds: discovery_service.to_h, clusters: [] }
+        h[:static_resources] = {
+          listeners: [listener.to_h],
+          clusters: [discovery_service.cluster.to_h]
+        }
+        h[:dynamic_resources] = {
+          cds_config: {
+            api_config_source: {
+              cluster_names: [discovery_service.cluster.name],
+              refresh_delay: {
+                seconds: discovery_service.refresh_delay_ms / 1000.0
+              }
+            }
+          }
+        }
 
         if statsd
-          h[:statsd_tcp_cluster_name] = statsd.name
-          h[:cluster_manager][:clusters] << statsd.to_h
+          statsd_address, statsd_port = statsd.split(':')
+          h[:stats_sinks] = [
+            {
+              name: 'envoy.dog_statsd',
+              config: {
+                address: {
+                  socket_address: {
+                    protocol: 'UDP',
+                    address: statsd_address,
+                    port_value: Integer(statsd_port)
+                  }
+                }
+              }
+            }
+          ]
+          h[:stats_config] = {
+            use_all_default_tags: true,
+            stats_tags: []
+          }
         end
 
         h
@@ -56,7 +85,8 @@ module Kumonos
     Listener = Struct.new(:address, :access_log_path, :discovery_service) do
       class << self
         def build(h, discovery_service)
-          new(h.fetch('address'), h.fetch('access_log_path'), discovery_service)
+          address = AddressParser.call(h.fetch('address'))
+          new(address, h.fetch('access_log_path'), discovery_service)
         end
       end
 
@@ -64,21 +94,38 @@ module Kumonos
         h = super
         h.delete(:discovery_service)
         h.delete(:access_log_path)
-        h[:filters] = [
+        h[:name] = 'egress'
+        h[:filter_chains] = [
           {
-            type: 'read',
-            name: 'http_connection_manager',
-            config: {
-              codec_type: 'auto',
-              stat_prefix: 'egress_http',
-              access_log: [{ path: access_log_path }],
-              rds: {
-                cluster: discovery_service.cluster.name,
-                route_config_name: DEFAULT_ROUTE_NAME,
-                refresh_delay_ms: discovery_service.refresh_delay_ms
-              },
-              filters: [{ type: 'decoder', name: 'router', config: {} }]
-            }
+            filters: [
+              {
+                name: 'envoy.http_connection_manager',
+                config: {
+                  codec_type: 'AUTO',
+                  stat_prefix: 'egress_http',
+                  access_log: [
+                    {
+                      name: 'envoy.file_access_log',
+                      config: {
+                        path: access_log_path
+                      }
+                    }
+                  ],
+                  rds: {
+                    config_source: {
+                      api_config_source: {
+                        cluster_names: [discovery_service.cluster.name],
+                        refresh_delay: {
+                          seconds: discovery_service.refresh_delay_ms / 1000.0
+                        }
+                      }
+                    },
+                    route_config_name: DEFAULT_ROUTE_NAME
+                  },
+                  http_filters: [{ name: 'envoy.router' }]
+                }
+              }
+            ]
           }
         ]
         h
@@ -89,13 +136,14 @@ module Kumonos
       class << self
         def build(h)
           lb = h.fetch('lb')
+          host, port = lb.split(':')
           cluster = Cluster.new(
             lb.split(':').first,
-            'strict_dns',
+            'STRICT_DNS',
             h.fetch('tls'),
             h.fetch('connect_timeout_ms'),
-            'round_robin',
-            [{ 'url' => "tcp://#{lb}" }]
+            'ROUND_ROBIN',
+            [{ 'socket_address' => { 'address' => host, 'port_value' => Integer(port) } }]
           )
           new(h.fetch('refresh_delay_ms'), cluster)
         end
@@ -117,8 +165,15 @@ module Kumonos
 
       def to_h
         h = super
+        h[:type] = type.upcase
+        h.delete(:lb_type)
+        h[:lb_policy] = lb_type.upcase
         h.delete(:tls)
-        h[:ssl_context] = {} if tls
+        h[:tls_context] = {} if tls
+        h.delete(:connect_timeout_ms)
+        h[:connect_timeout] = {
+          seconds: connect_timeout_ms / 1000.0
+        }
         h
       end
     end
@@ -126,8 +181,23 @@ module Kumonos
     Admin = Struct.new(:address, :access_log_path) do
       class << self
         def build(h)
-          new(h.fetch('address'), h.fetch('access_log_path'))
+          address = AddressParser.call(h.fetch('address'))
+          new(address, h.fetch('access_log_path'))
         end
+      end
+    end
+
+    # Parse old address string
+    module AddressParser
+      def self.call(address)
+        raise "invalid address given: #{address}" if address !~ %r{tcp://([^:]+):(\d+)}
+
+        {
+          socket_address: {
+            address: Regexp.last_match(1),
+            port_value: Integer(Regexp.last_match(2))
+          }
+        }
       end
     end
   end

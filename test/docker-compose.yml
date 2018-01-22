@@ -56,20 +56,12 @@ services:
       - "0.0.0.0:2000"
       - "statsd-exporter:9125"
   envoy:
-    image: 'envoyproxy/envoy:3213ef0ddef11f3dfee0883333050844a297cc5d'
+    build: 'envoy'
     depends_on:
       - 'user-app'
       - 'ab-testing-app'
       - 'nginx'
       - 'relay'
-    command:
-      - 'envoy'
-      - '-c'
-      - '/config.json'
-      - '--service-cluster'
-      - 'book'
-      - '--service-node'
-      - 'book'
     volumes:
       - './config.json:/config.json:ro'
     expose:

@@ -85,29 +85,14 @@
     "statsd": {
       "type": "object",
       "id": "/properties/statsd",
-      "additionalProperties": false,
+      "additionalProperties": true,
       "required": [
-        "address",
-        "tls",
-        "type",
-        "connect_timeout_ms"
+        "address"
       ],
       "properties": {
         "address": {
           "type": "string",
           "id": "/properties/statsd/properties/address"
-        },
-        "tls": {
-          "type": "boolean",
-          "id": "/properties/statsd/properties/tls"
-        },
-        "type": {
-          "type": "string",
-          "id": "/properties/statsd/properties/type"
-        },
-        "connect_timeout_ms": {
-          "type": "integer",
-          "id": "/properties/statsd/properties/connect_timeout_ms"
         }
       }
     }

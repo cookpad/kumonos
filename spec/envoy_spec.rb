@@ -6,60 +6,94 @@ RSpec.describe Kumonos::Envoy do
   specify 'generate' do
     out = JSON.dump(Kumonos::Envoy.generate(definition))
     expect(out).to be_json_as(
-      listeners: [
+      admin: {
+        access_log_path: '/dev/stdout',
+        address: {
+          socket_address: { address: '0.0.0.0', port_value: 9901 }
+        }
+      },
+      stats_sinks: [
         {
-          address: 'tcp://0.0.0.0:9211',
-          filters: [
-            {
-              type: 'read',
-              name: 'http_connection_manager',
-              config: {
-                codec_type: 'auto',
-                stat_prefix: 'egress_http',
-                access_log: [{ path: '/dev/stdout' }],
-                rds: {
-                  cluster: 'nginx',
-                  route_config_name: 'default',
-                  refresh_delay_ms: 30_000
-                },
+          name: 'envoy.dog_statsd',
+          config: {
+            address: {
+              socket_address: {
+                protocol: 'UDP',
+                address: 'statsd-exporter',
+                port_value: 9125
+              }
+            }
+          }
+        }
+      ],
+      stats_config: {
+        use_all_default_tags: true,
+        stats_tags: []
+      },
+      static_resources: {
+        listeners: [
+          {
+            name: 'egress',
+            address: {
+              socket_address: { address: '0.0.0.0', port_value: 9211 }
+            },
+            filter_chains: [
+              {
                 filters: [
                   {
-                    type: 'decoder',
-                    name: 'router',
-                    config: {}
+                    name: 'envoy.http_connection_manager',
+                    config: {
+                      codec_type: 'AUTO',
+                      stat_prefix: 'egress_http',
+                      access_log: [
+                        {
+                          name: 'envoy.file_access_log',
+                          config: {
+                            path: '/dev/stdout'
+                          }
+                        }
+                      ],
+                      rds: {
+                        config_source: {
+                          api_config_source: {
+                            cluster_names: ['nginx'],
+                            refresh_delay: {
+                              seconds: 30
+                            }
+                          }
+                        },
+                        route_config_name: 'default'
+                      },
+                      http_filters: [{ name: 'envoy.router' }]
+                    }
                   }
                 ]
               }
-            }
-          ]
-        }
-      ],
-      admin: {
-        access_log_path: '/dev/stdout',
-        address: 'tcp://0.0.0.0:9901'
-      },
-      statsd_tcp_cluster_name: 'statsd',
-      cluster_manager: {
-        clusters: [
-          {
-            name: 'statsd',
-            connect_timeout_ms: 1_000,
-            type: 'strict_dns',
-            lb_type: 'round_robin',
-            hosts: [{ url: 'tcp://relay:2000' }]
+            ]
           }
         ],
-        cds: {
-          cluster: {
+        clusters: [
+          {
             name: 'nginx',
-            type: 'strict_dns',
-            connect_timeout_ms: 1_000,
-            lb_type: 'round_robin',
+            connect_timeout: {
+              seconds: 1
+            },
+            type: 'STRICT_DNS',
+            lb_policy: 'ROUND_ROBIN',
             hosts: [
-              { url: 'tcp://nginx:80' }
+              { socket_address: { address: 'nginx', port_value: 80 } }
             ]
-          },
-          refresh_delay_ms: 30_000
+          }
+        ]
+      },
+      dynamic_resources: {
+        cds_config: {
+          api_config_source: {
+            cluster_names: ['nginx'],
+            refresh_delay: {
+              seconds: 30
+            }
+          }
         }
       }
     )
@@ -68,15 +102,17 @@ RSpec.describe Kumonos::Envoy do
   specify '.generate with ds with TLS' do
     definition['discovery_service']['tls'] = true
     out = Kumonos::Envoy.generate(definition)
-    ds_cluster = out.fetch(:cluster_manager).fetch(:cds).fetch(:cluster)
+    ds_cluster = out.fetch(:static_resources).fetch(:clusters)[0]
     expect(JSON.dump(ds_cluster)).to be_json_as(
       name: 'nginx',
-      type: 'strict_dns',
-      ssl_context: {},
-      connect_timeout_ms: 1_000,
-      lb_type: 'round_robin',
+      type: 'STRICT_DNS',
+      tls_context: {},
+      connect_timeout: {
+        seconds: 1.0
+      },
+      lb_policy: 'ROUND_ROBIN',
       hosts: [
-        { url: 'tcp://nginx:80' }
+        { socket_address: { address: 'nginx', port_value: 80 } }
       ]
     )
   end
@@ -84,7 +120,7 @@ RSpec.describe Kumonos::Envoy do
   specify '.generate without statsd' do
     definition.delete('statsd')
     out = Kumonos::Envoy.generate(definition)
-    expect(out).not_to have_key(:statsd_tcp_cluster_name)
-    expect(out[:cluster_manager][:clusters]).to be_empty
+    expect(out).not_to have_key(:stats_sinks)
+    expect(out).not_to have_key(:stats_config)
   end
 end
