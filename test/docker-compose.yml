@@ -41,27 +41,13 @@ services:
     image: 'prom/statsd-exporter'
     ports:
       - '9102:9102'
-  relay:
-    build: '..'
-    depends_on:
-      - 'statsd-exporter'
-    environment:
-      APP_ID: 'test'
-    command:
-      - "bundle"
-      - "exec"
-      - "./exe/kumonos-relay"
-      - "--service-cluster=test"
-      - "--service-node=test"
-      - "0.0.0.0:2000"
-      - "statsd-exporter:9125"
   envoy:
     build: 'envoy'
     depends_on:
       - 'user-app'
       - 'ab-testing-app'
       - 'nginx'
-      - 'relay'
+      - 'statsd-exporter'
     volumes:
       - './config.json:/config.json:ro'
     expose:

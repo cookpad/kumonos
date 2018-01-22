@@ -67,7 +67,7 @@ if ENV['TEST_WITH_RELAY'] == '1'
       end
     end
 
-    puts 'pass relay test'
+    puts 'pass stats tag test'
   end
 end
 
