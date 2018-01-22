@@ -2,9 +2,16 @@ RSpec.describe Kumonos::Envoy do
   let(:definition) do
     YAML.load_file(File.expand_path('../example/envoy_config.yml', __dir__))
   end
+  let(:cluster) { 'test-cluster' }
+  let(:node) { 'test-node' }
 
   specify 'generate' do
-    out = JSON.dump(Kumonos::Envoy.generate(definition))
+    config = Kumonos::Envoy.generate(
+      definition,
+      cluster: cluster,
+      node: node
+    )
+    out = JSON.dump(config)
     expect(out).to be_json_as(
       admin: {
         access_log_path: '/dev/stdout',
@@ -28,7 +35,10 @@ RSpec.describe Kumonos::Envoy do
       ],
       stats_config: {
         use_all_default_tags: true,
-        stats_tags: []
+        stats_tags: [
+          { tag_name: 'service-cluster', fixed_value: cluster },
+          { tag_name: 'service-node', fixed_value: node }
+        ]
       },
       static_resources: {
         listeners: [
@@ -101,7 +111,7 @@ RSpec.describe Kumonos::Envoy do
 
   specify '.generate with ds with TLS' do
     definition['discovery_service']['tls'] = true
-    out = Kumonos::Envoy.generate(definition)
+    out = Kumonos::Envoy.generate(definition, cluster: cluster, node: node)
     ds_cluster = out.fetch(:static_resources).fetch(:clusters)[0]
     expect(JSON.dump(ds_cluster)).to be_json_as(
       name: 'nginx',
@@ -119,7 +129,7 @@ RSpec.describe Kumonos::Envoy do
 
   specify '.generate without statsd' do
     definition.delete('statsd')
-    out = Kumonos::Envoy.generate(definition)
+    out = Kumonos::Envoy.generate(definition, cluster: cluster, node: node)
     expect(out).not_to have_key(:stats_sinks)
     expect(out).not_to have_key(:stats_config)
   end

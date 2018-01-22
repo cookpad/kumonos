@@ -13,12 +13,19 @@ class KumonosCli < Thor
 
   desc 'envoy ENVOY_DEFINITION', 'Generate envoy configuration'
   method_option :output, aliases: '-o', desc: 'Output path', required: true, type: :string
+  method_option :'service-cluster', desc: 'Service cluster', required: true, type: :string
+  method_option :'service-node', desc: 'Service node', required: true, type: :string
   def envoy(path)
     validate_path!(path)
     definition = YAML.load_file(path)
     validate_envoy_definition!(definition, path)
 
-    File.write(options.fetch(:output), JSON.dump(Kumonos::Envoy.generate(definition)))
+    config = Kumonos::Envoy.generate(
+      definition,
+      cluster: options.fetch(:'service-cluster'),
+      node: options.fetch(:'service-node')
+    )
+    File.write(options.fetch(:output), JSON.dump(config))
   end
 
   desc 'clusters SERVIVE_DEFINITION', 'Generate clusters configuration'
