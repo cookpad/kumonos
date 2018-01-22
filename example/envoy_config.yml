@@ -11,7 +11,4 @@ discovery_service:
   refresh_delay_ms: 30000
   connect_timeout_ms: 1000
 statsd:
-  address: relay:2000
-  tls: false
-  type: strict_dns
-  connect_timeout_ms: 1000
+  address: statsd-exporter:9125
