@@ -166,7 +166,8 @@ module Kumonos
     Cluster = Struct.new(:name, :type, :tls, :connect_timeout_ms, :lb_type, :hosts) do
       class << self
         def build(h)
-          new(h.fetch('name'), h.fetch('type'), h.fetch('tls'), h.fetch('connect_timeout_ms'), h.fetch('lb_type'), h.fetch('hosts'))
+          new(h.fetch('name'), h.fetch('type'), h.fetch('tls'), h.fetch('connect_timeout_ms'),
+              h.fetch('lb_type'), h.fetch('hosts'))
         end
       end
 
@@ -181,6 +182,8 @@ module Kumonos
         h[:connect_timeout] = {
           seconds: connect_timeout_ms / 1000.0
         }
+        # Just work-around, it could be configurable.
+        h[:dns_lookup_family] = 'V4_ONLY'
         h
       end
     end
