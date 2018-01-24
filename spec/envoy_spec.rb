@@ -89,6 +89,7 @@ RSpec.describe Kumonos::Envoy do
               seconds: 1
             },
             type: 'STRICT_DNS',
+            dns_lookup_family: 'V4_ONLY',
             lb_policy: 'ROUND_ROBIN',
             hosts: [
               { socket_address: { address: 'nginx', port_value: 80 } }
@@ -116,6 +117,7 @@ RSpec.describe Kumonos::Envoy do
     expect(JSON.dump(ds_cluster)).to be_json_as(
       name: 'nginx',
       type: 'STRICT_DNS',
+      dns_lookup_family: 'V4_ONLY',
       tls_context: {},
       connect_timeout: {
         seconds: 1.0
