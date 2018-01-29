@@ -57,6 +57,16 @@ module Kumonos
                 seconds: discovery_service.refresh_delay_ms / 1000.0
               }
             }
+          },
+          deprecated_v1: {
+            sds_config: {
+              api_config_source: {
+                cluster_names: [discovery_service.cluster.name],
+                refresh_delay: {
+                  seconds: discovery_service.refresh_delay_ms / 1000.0
+                }
+              }
+            },
           }
         }
 

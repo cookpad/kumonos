@@ -26,9 +26,9 @@ module Kumonos
         h = super
 
         h.delete(:lb)
-        h[:type] = 'strict_dns'
+        h[:type] = 'sds'
         h[:lb_type] = 'round_robin'
-        h[:hosts] = [{ url: "tcp://#{lb}" }]
+        h[:service_name] = 'book'
 
         h.delete(:tls)
         h[:ssl_context] = {} if tls
