@@ -32,12 +32,12 @@ Net::HTTP.start(envoy_url.host, envoy_url.port) do |http|
   response = http.get('/', Host: 'user')
   p response, response.body
   raise_error if response.code != '200'
-  raise_error if response.body != 'GET,user-app,user'
+  raise_error if response.body != 'GET,user,user'
 
   response = http.get('/', Host: 'ab-testing')
   p response, response.body
   raise_error if response.code != '200'
-  raise_error if response.body != 'GET,ab-testing-app,ab-testing'
+  raise_error if response.body != 'GET,ab-testing,ab-testing'
 
   puts 'pass'
 end
