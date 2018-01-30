@@ -10,5 +10,10 @@ discovery_service:
   tls: false
   refresh_delay_ms: 30000
   connect_timeout_ms: 1000
+eds:
+  lb: eds:8080
+  tls: false
+  refresh_delay_ms: 30000
+  connect_timeout_ms: 1000
 statsd:
   address: statsd-exporter:9125

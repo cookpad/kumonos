@@ -1,0 +1,61 @@
+#!/usr/bin/env ruby
+require 'json'
+require 'resolv'
+
+require 'sinatra'
+
+Host = Struct.new(:ip_address, :port, :az, :canary, :load_balancing_weight) do
+  def self.from_hash(h)
+    new(*h.slice(*members).values)
+  end
+
+  def to_h
+    h = super
+    h.delete(:az)
+    h.delete(:canary)
+    h.delete(:load_balancing_weight)
+    h[:tags] = {}
+    h[:tags][:az] = az if az
+    h[:tags][:canary] = canary if canary
+    h[:tags][:load_balancing_weight] = load_balancing_weight if load_balancing_weight
+    h
+  end
+end
+
+class Storage
+  def initialize
+  end
+
+  def create(service_name, hosts)
+  end
+
+  # @return [Host]
+  def fetch(service_name)
+  end
+
+  def delete(service_name, hosts)
+  end
+end
+
+get '/v1/registration/:service_name' do
+  if params[:service_name] == 'user'
+    ip = Resolv.getaddress('user-app')
+  elsif params[:service_name] == 'ab-testing'
+    ip = Resolv.getaddress('ab-testing-app')
+  else
+    return [404, {}, ["unkown service_name: #{params[:service_name]}"]]
+  end
+  host = Host.new(ip, 8080)
+
+  content_type :json
+  { hosts: [host.to_h] }.to_json
+end
+
+post '/v1/registration/:service_name' do
+  params[:service_name]
+end
+
+post '/v1/deregister' do
+  params[:service_name]
+  params[:hosts]
+end

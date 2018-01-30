@@ -28,7 +28,7 @@ module Kumonos
         h.delete(:lb)
         h[:type] = 'sds'
         h[:lb_type] = 'round_robin'
-        h[:service_name] = 'book'
+        h[:service_name] = name
 
         h.delete(:tls)
         h[:ssl_context] = {} if tls

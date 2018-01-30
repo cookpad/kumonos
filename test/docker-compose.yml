@@ -23,6 +23,18 @@ services:
       - './srv:/srv:ro'
     ports:
       - '3080:80'
+  eds:
+    build: '..'
+    command:
+      - "bundle"
+      - "exec"
+      - "./exe/kumonos-api"
+      - "-o"
+      - "0.0.0.0"
+      - "-p"
+      - "8080"
+    ports:
+      - '4000:8080'
   prometheus:
     image: 'prom/prometheus'
     ports:
