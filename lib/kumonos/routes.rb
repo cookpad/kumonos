@@ -14,7 +14,8 @@ module Kumonos
       class << self
         def build(h)
           name = h.fetch('name')
-          routes = h.fetch('routes').map { |r| Route.build(r, name) }
+          cluster_name = h.fetch('cluster_name')
+          routes = h.fetch('routes').map { |r| Route.build(r, cluster_name) }
           new(name, [name], routes)
         end
       end
