@@ -4,7 +4,7 @@ version: 1
 dependencies:
   - name: 'user'
     cluster_name: 'user-development'
-    lb: 'user-app:8080'
+    sds: true
     tls: false
     connect_timeout_ms: 250
     circuit_breaker:

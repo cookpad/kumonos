@@ -20,11 +20,10 @@
       "items": {
         "type": "object",
         "id": "/properties/dependencies/items",
-        "additionalProperties": false,
+        "additionalProperties": true,
         "required": [
           "name",
           "cluster_name",
-          "lb",
           "tls",
           "connect_timeout_ms",
           "circuit_breaker",
@@ -40,6 +39,11 @@
             "type": "string",
             "id": "/properties/dependencies/items/properties/name",
             "default": "dependency-service-name-development"
+          },
+          "sds": {
+            "type": "boolean",
+            "id": "/properties/dependencies/items/properties/sds",
+            "default": false
           },
           "lb": {
             "type": "string",

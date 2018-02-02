@@ -8,7 +8,8 @@
     "version",
     "listener",
     "admin",
-    "discovery_service"
+    "discovery_service",
+    "sds"
   ],
   "properties": {
     "version": {
@@ -79,6 +80,35 @@
         "connect_timeout_ms": {
           "type": "integer",
           "id": "/properties/discovery_service/properties/properties/connect_timeout_ms"
+        }
+      }
+    },
+    "sds": {
+      "type": "object",
+      "id": "/properties/sds",
+      "additionalProperties": false,
+      "required": [
+        "lb",
+        "tls",
+        "refresh_delay_ms",
+        "connect_timeout_ms"
+      ],
+      "properties": {
+        "lb": {
+          "type": "string",
+          "id": "/properties/sds/properties/properties/lb"
+        },
+        "tls": {
+          "type": "boolean",
+          "id": "/properties/sds/properties/properties/tls"
+        },
+        "refresh_delay_ms": {
+          "type": "integer",
+          "id": "/properties/sds/properties/refresh_delay_ms"
+        },
+        "connect_timeout_ms": {
+          "type": "integer",
+          "id": "/properties/sds/properties/properties/connect_timeout_ms"
         }
       }
     },
