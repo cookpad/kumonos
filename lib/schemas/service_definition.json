@@ -23,6 +23,7 @@
         "additionalProperties": false,
         "required": [
           "name",
+          "cluster_name",
           "lb",
           "tls",
           "connect_timeout_ms",
@@ -34,6 +35,11 @@
             "type": "string",
             "id": "/properties/dependencies/items/properties/name",
             "default": "dependency-service-name"
+          },
+          "cluster_name": {
+            "type": "string",
+            "id": "/properties/dependencies/items/properties/name",
+            "default": "dependency-service-name-development"
           },
           "lb": {
             "type": "string",

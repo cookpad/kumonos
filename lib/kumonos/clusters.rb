@@ -13,7 +13,7 @@ module Kumonos
       class << self
         def build(h)
           new(
-            h.fetch('name'),
+            h.fetch('cluster_name'),
             h.fetch('connect_timeout_ms'),
             h.fetch('lb'),
             h.fetch('tls'),

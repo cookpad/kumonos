@@ -2,6 +2,7 @@
 version: 1
 dependencies:
   - name: 'example'
+    cluster_name: 'example-development'
     lb: 'example.com:443'
     tls: true
     connect_timeout_ms: 250

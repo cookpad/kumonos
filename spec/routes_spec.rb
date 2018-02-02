@@ -18,7 +18,7 @@ RSpec.describe Kumonos::Routes do
               prefix: '/',
               timeout_ms: 3000,
               auto_host_rewrite: true,
-              cluster: 'user',
+              cluster: 'user-development',
               retry_policy: {
                 retry_on: '5xx,connect-failure,refused-stream',
                 num_retries: 3,
@@ -36,7 +36,7 @@ RSpec.describe Kumonos::Routes do
               prefix: '/',
               timeout_ms: 3000,
               auto_host_rewrite: true,
-              cluster: 'user'
+              cluster: 'user-development'
             }
           ]
         },
@@ -48,7 +48,7 @@ RSpec.describe Kumonos::Routes do
               prefix: '/',
               timeout_ms: 3000,
               auto_host_rewrite: true,
-              cluster: 'ab-testing',
+              cluster: 'ab-testing-development',
               retry_policy: {
                 retry_on: '5xx,connect-failure,refused-stream',
                 num_retries: 3,
@@ -66,7 +66,7 @@ RSpec.describe Kumonos::Routes do
               prefix: '/',
               timeout_ms: 3000,
               auto_host_rewrite: true,
-              cluster: 'ab-testing'
+              cluster: 'ab-testing-development'
             }
           ]
         }

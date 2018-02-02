@@ -9,7 +9,7 @@ RSpec.describe Kumonos::Clusters do
     expect(out).to be_json_as(
       clusters: [
         {
-          name: 'user',
+          name: 'user-development',
           connect_timeout_ms: 250,
           type: 'strict_dns',
           lb_type: 'round_robin',
@@ -23,7 +23,7 @@ RSpec.describe Kumonos::Clusters do
           }
         },
         {
-          name: 'ab-testing',
+          name: 'ab-testing-development',
           connect_timeout_ms: 250,
           type: 'strict_dns',
           lb_type: 'round_robin',
@@ -50,7 +50,7 @@ RSpec.describe Kumonos::Clusters do
     expect(out).to be_json_as(
       clusters: [
         {
-          name: 'example',
+          name: 'example-development',
           connect_timeout_ms: 250,
           type: 'strict_dns',
           lb_type: 'round_robin',
