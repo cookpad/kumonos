@@ -64,6 +64,7 @@ class KumonosCli < Thor
     definition['dependencies'] = definition.fetch('dependencies')[0..0]
     dep = definition['dependencies'][0]
     dep['name'] = 'target-service-name'
+    dep['cluster_name'] = 'target-service-name-staging'
     dep['lb'] = 'hostname-for-load-balancer:port'
     path = "#{name}.yml"
     File.open(path, 'w') { |f| YAML.dump(definition, f) }

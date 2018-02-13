@@ -9,15 +9,19 @@ module Kumonos
       end
     end
 
-    Cluster = Struct.new(:name, :connect_timeout_ms, :lb, :tls, :circuit_breaker) do
+    Cluster = Struct.new(:name, :connect_timeout_ms, :lb, :tls, :circuit_breaker, :use_sds) do
       class << self
         def build(h)
+          use_sds = h.fetch('sds', false)
+          lb = use_sds ? nil : h.fetch('lb')
+
           new(
             h.fetch('cluster_name'),
             h.fetch('connect_timeout_ms'),
-            h.fetch('lb'),
+            lb,
             h.fetch('tls'),
-            CircuitBreaker.build(h.fetch('circuit_breaker'))
+            CircuitBreaker.build(h.fetch('circuit_breaker')),
+            use_sds
           )
         end
       end
@@ -26,10 +30,16 @@ module Kumonos
         h = super
 
         h.delete(:lb)
-        h[:type] = 'strict_dns'
-        h[:lb_type] = 'round_robin'
-        h[:hosts] = [{ url: "tcp://#{lb}" }]
+        h.delete(:use_sds)
+        if use_sds
+          h[:type] = 'sds'
+          h[:service_name] = name
+        else
+          h[:type] = 'strict_dns'
+          h[:hosts] = [{ url: "tcp://#{lb}" }]
+        end
 
+        h[:lb_type] = 'round_robin'
         h.delete(:tls)
         h[:ssl_context] = {} if tls
 

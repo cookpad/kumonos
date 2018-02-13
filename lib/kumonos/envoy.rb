@@ -7,10 +7,11 @@ module Kumonos
       end
     end
 
-    EnvoyConfig = Struct.new(:version, :discovery_service, :statsd, :listener, :admin, :cluster, :node) do
+    EnvoyConfig = Struct.new(:version, :discovery_service, :statsd, :listener, :admin, :cluster, :node, :sds) do
       class << self
         def build(h, cluster:, node:)
           discovery_service = DiscoverService.build(h.fetch('discovery_service'))
+          sds = DiscoverService.build(h.fetch('sds'))
           new(
             h.fetch('version'),
             discovery_service,
@@ -18,7 +19,8 @@ module Kumonos
             Listener.build(h.fetch('listener'), discovery_service),
             Admin.build(h.fetch('admin')),
             cluster,
-            node
+            node,
+            sds
           )
         end
 
@@ -40,6 +42,7 @@ module Kumonos
         h = super
         h.delete(:version)
         h.delete(:discovery_service)
+        h.delete(:sds)
         h.delete(:statsd)
         h.delete(:listener)
         h.delete(:cluster)
@@ -47,7 +50,7 @@ module Kumonos
         h[:admin] = admin.to_h
         h[:static_resources] = {
           listeners: [listener.to_h],
-          clusters: [discovery_service.cluster.to_h]
+          clusters: [discovery_service.cluster.to_h, sds.cluster.to_h]
         }
         h[:dynamic_resources] = {
           cds_config: {
@@ -55,6 +58,16 @@ module Kumonos
               cluster_names: [discovery_service.cluster.name],
               refresh_delay: {
                 seconds: discovery_service.refresh_delay_ms / 1000.0
+              }
+            }
+          },
+          deprecated_v1: {
+            sds_config: {
+              api_config_source: {
+                cluster_names: [sds.cluster.name],
+                refresh_delay: {
+                  seconds: sds.refresh_delay_ms / 1000.0
+                }
               }
             }
           }

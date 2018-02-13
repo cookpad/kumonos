@@ -1,3 +1,4 @@
+require 'resolv'
 require 'sinatra'
 
 get '/' do
@@ -9,4 +10,8 @@ end
 post '/' do
   raise 'error' if rand(0..ENV['ERROR_RATE'].to_i).zero?
   "POST and #{ENV['RESPONSE'] || 'hello'}"
+end
+
+get '/ip/:name' do
+  Resolv.getaddress(params[:name])
 end

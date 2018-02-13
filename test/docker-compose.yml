@@ -5,15 +5,17 @@ services:
     environment:
       RESPONSE: 'user'
       SLEEP: 0
-      ERROR_RATE: 5
+      #ERROR_RATE: 5
     expose:
       - '8080'
+    ports:
+      - '3081:8080'
   ab-testing-app:
     build: 'app'
     environment:
       RESPONSE: 'ab-testing'
       SLEEP: 0
-      ERROR_RATE: 5
+      #ERROR_RATE: 5
     expose:
       - '8080'
   nginx:
@@ -23,6 +25,17 @@ services:
       - './srv:/srv:ro'
     ports:
       - '3080:80'
+  sds:
+    image: 'taiki45/discovery'
+    environment:
+      BACKEND_STORAGE: InMemory
+      APPLICATION_ENV: development
+      DEBUG: 'true'
+      LOG_LEVEL: DEBUG
+      PORT: 8080
+      CACHE_TYPE: simple
+    ports:
+      - '4000:8080'
   prometheus:
     image: 'prom/prometheus'
     ports:
@@ -42,6 +55,7 @@ services:
       - 'ab-testing-app'
       - 'nginx'
       - 'statsd-exporter'
+      - 'sds'
     volumes:
       - './config.json:/config.json:ro'
     expose:

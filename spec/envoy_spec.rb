@@ -68,7 +68,7 @@ RSpec.describe Kumonos::Envoy do
                           api_config_source: {
                             cluster_names: ['nginx'],
                             refresh_delay: {
-                              seconds: 30
+                              seconds: 10
                             }
                           }
                         },
@@ -94,6 +94,18 @@ RSpec.describe Kumonos::Envoy do
             hosts: [
               { socket_address: { address: 'nginx', port_value: 80 } }
             ]
+          },
+          {
+            name: 'sds',
+            connect_timeout: {
+              seconds: 1
+            },
+            type: 'STRICT_DNS',
+            dns_lookup_family: 'V4_ONLY',
+            lb_policy: 'ROUND_ROBIN',
+            hosts: [
+              { socket_address: { address: 'sds', port_value: 8080 } }
+            ]
           }
         ]
       },
@@ -102,7 +114,15 @@ RSpec.describe Kumonos::Envoy do
           api_config_source: {
             cluster_names: ['nginx'],
             refresh_delay: {
-              seconds: 30
+              seconds: 10
+            }
+          }
+        },
+        deprecated_v1: {
+          sds_config: {
+            api_config_source: {
+              cluster_names: ['sds'],
+              refresh_delay: { seconds: 1.0 }
             }
           }
         }

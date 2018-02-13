@@ -8,7 +8,12 @@ admin:
 discovery_service:
   lb: nginx:80
   tls: false
-  refresh_delay_ms: 30000
+  refresh_delay_ms: 10000
+  connect_timeout_ms: 1000
+sds:
+  lb: sds:8080
+  tls: false
+  refresh_delay_ms: 1000
   connect_timeout_ms: 1000
 statsd:
   address: statsd-exporter:9125
