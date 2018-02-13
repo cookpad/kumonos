@@ -66,6 +66,7 @@ class KumonosCli < Thor
     dep['name'] = 'target-service-name'
     dep['cluster_name'] = 'target-service-name-staging'
     dep['lb'] = 'hostname-for-load-balancer:port'
+    dep.delete('sds')
     path = "#{name}.yml"
     File.open(path, 'w') { |f| YAML.dump(definition, f) }
     puts path
