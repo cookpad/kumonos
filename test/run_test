@@ -8,5 +8,5 @@ mkdir srv
 ../exe/kumonos clusters -o srv ../example/book.yml
 ../exe/kumonos routes -o srv ../example/book.yml
 docker-compose up --build -d
-ruby test.rb
+bundle exec ruby test.rb
 docker-compose down
