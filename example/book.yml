@@ -4,7 +4,7 @@ version: 1
 dependencies:
   - name: 'user'
     cluster_name: 'user-development'
-    sds: true
+    lb: 'user-app:8080'
     tls: false
     connect_timeout_ms: 250
     circuit_breaker:
@@ -20,7 +20,7 @@ dependencies:
           per_try_timeout_ms: 1000
   - name: 'ab-testing'
     cluster_name: 'ab-testing-development'
-    lb: 'ab-testing-app:8080'
+    sds: true
     tls: false
     connect_timeout_ms: 250
     circuit_breaker:

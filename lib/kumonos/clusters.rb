@@ -34,6 +34,7 @@ module Kumonos
         if use_sds
           h[:type] = 'sds'
           h[:service_name] = name
+          h[:features] = 'http2'
         else
           h[:type] = 'strict_dns'
           h[:hosts] = [{ url: "tcp://#{lb}" }]

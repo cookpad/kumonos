@@ -1,6 +1,9 @@
 AllCops:
   DisplayCopNames: true
   DisplayStyleGuide: true
+  Exclude:
+    - 'test/grpc/lib/health_pb.rb'
+    - 'test/grpc/lib/health_services_pb.rb'
 
 Metrics/BlockLength:
   Enabled: false
