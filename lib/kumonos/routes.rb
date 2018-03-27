@@ -15,7 +15,8 @@ module Kumonos
         def build(h)
           name = h.fetch('name')
           cluster_name = h.fetch('cluster_name')
-          routes = h.fetch('routes').map { |r| Route.build(r, cluster_name) }
+          host_header = h['host_header']
+          routes = h.fetch('routes').map { |r| Route.build(r, cluster_name, host_header) }
           new(name, [name], routes)
         end
       end
@@ -27,17 +28,22 @@ module Kumonos
       end
     end
 
-    Route = Struct.new(:prefix, :cluster, :timeout_ms, :retry_policy) do
+    Route = Struct.new(:prefix, :cluster, :timeout_ms, :retry_policy, :host_header) do
       class << self
-        def build(h, cluster)
-          new(h.fetch('prefix'), cluster, h.fetch('timeout_ms'), RetryPolicy.build(h.fetch('retry_policy')))
+        def build(h, cluster, host_header)
+          new(h.fetch('prefix'), cluster, h.fetch('timeout_ms'), RetryPolicy.build(h.fetch('retry_policy')), host_header)
         end
       end
 
       def to_h
         h = super
         h.delete(:retry_policy)
-        h[:auto_host_rewrite] = true
+        h.delete(:host_header)
+        if host_header
+          h[:host_rewrite] = host_header
+        else
+          h[:auto_host_rewrite] = true
+        end
         h
       end
 

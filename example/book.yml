@@ -5,6 +5,7 @@ dependencies:
   - name: 'user'
     cluster_name: 'user-development'
     lb: 'user-app:8080'
+    host_header: 'user-service'
     tls: false
     connect_timeout_ms: 250
     circuit_breaker:
