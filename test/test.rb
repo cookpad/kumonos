@@ -98,7 +98,7 @@ Net::HTTP.start(envoy_url.host, envoy_url.port) do |http|
 
   response = http.get('/', Host: 'user')
   raise_error if response.code != '200'
-  raise_error if response.body != 'GET,user-app,user'
+  raise_error if response.body != 'GET,user-service,user'
 
   stub = Grpc::Health::V1::Health::Stub.new(
     "#{envoy_url.host}:#{envoy_url.port}",

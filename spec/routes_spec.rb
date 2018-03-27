@@ -17,7 +17,7 @@ RSpec.describe Kumonos::Routes do
             {
               prefix: '/',
               timeout_ms: 3000,
-              auto_host_rewrite: true,
+              host_rewrite: 'user-service',
               cluster: 'user-development',
               retry_policy: {
                 retry_on: '5xx,connect-failure,refused-stream',
@@ -35,7 +35,7 @@ RSpec.describe Kumonos::Routes do
             {
               prefix: '/',
               timeout_ms: 3000,
-              auto_host_rewrite: true,
+              host_rewrite: 'user-service',
               cluster: 'user-development'
             }
           ]
