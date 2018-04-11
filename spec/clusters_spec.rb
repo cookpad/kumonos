@@ -1,7 +1,7 @@
 RSpec.describe Kumonos::Clusters do
   let(:definition) do
-    filename = File.expand_path('../example/book.yml', __dir__)
-    YAML.load_file(filename)
+    filename = File.expand_path('../example/book.jsonnet', __dir__)
+    Jsonnet.load(filename)
   end
 
   specify '.generate' do
