@@ -5,6 +5,9 @@ $LOAD_PATH.unshift(File.expand_path('../lib', __dir__))
 require 'kumonos'
 require 'thor'
 
+require 'json'
+require 'jsonnet'
+
 # KumonosCli
 class KumonosCli < Thor
   def self.exit_on_failure?
@@ -17,7 +20,7 @@ class KumonosCli < Thor
   method_option :'service-node', desc: 'Service node', required: true, type: :string
   def envoy(path)
     validate_path!(path)
-    definition = YAML.load_file(path)
+    definition = load_definition(path)
     validate_envoy_definition!(definition, path)
 
     config = Kumonos::Envoy.generate(
@@ -35,7 +38,7 @@ class KumonosCli < Thor
     validate_path!(filepath)
     validate_path!(output_dir)
 
-    definition = YAML.load_file(filepath)
+    definition = load_definition(filepath)
     validate_service_definition!(definition, filepath)
     json = JSON.dump(Kumonos::Clusters.generate(definition))
 
@@ -50,7 +53,7 @@ class KumonosCli < Thor
     validate_path!(filepath)
     validate_path!(output_dir)
 
-    definition = YAML.load_file(filepath)
+    definition = load_definition(filepath)
     validate_service_definition!(definition, filepath)
     json = JSON.dump(Kumonos::Routes.generate(definition))
 
@@ -60,15 +63,15 @@ class KumonosCli < Thor
 
   desc 'init NAME', 'Generate a service definition'
   def init(name)
-    definition = YAML.load_file(File.expand_path('../example/book.yml', __dir__))
+    definition = load_definition(File.expand_path('../example/book.jsonnet', __dir__))
     definition['dependencies'] = definition.fetch('dependencies')[0..0]
     dep = definition['dependencies'][0]
     dep['name'] = 'target-service-name'
     dep['cluster_name'] = 'target-service-name-staging'
     dep['lb'] = 'hostname-for-load-balancer:port'
     dep.delete('sds')
-    path = "#{name}.yml"
-    File.open(path, 'w') { |f| YAML.dump(definition, f) }
+    path = "#{name}.jsonnet"
+    File.write(path, JSON.pretty_generate(definition))
     puts path
   end
 
@@ -98,6 +101,16 @@ class KumonosCli < Thor
     warn(result)
     warn("The schema file is #{schema_path}")
     exit 1
+  end
+
+  def load_definition(path)
+    if path.end_with?('.jsonnet')
+      Jsonnet.load(path)
+    elsif path.end_with?('.yml', '.yaml')
+      YAML.load_file(path)
+    else
+      raise "Unknown extension given, expected '.jsonnet', '.yml' or 'yaml': #{path}"
+    end
   end
 end
 
