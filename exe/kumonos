@@ -75,6 +75,17 @@ class KumonosCli < Thor
     puts path
   end
 
+  desc 'yaml SERVIVE_DEFINITION', 'Generate definition as YAML'
+  def yaml(filepath)
+    validate_path!(filepath)
+    raise "Expected JSonnet file: #{filepath}" unless filepath.end_with?('.jsonnet')
+
+    definition = load_definition(filepath)
+    new_path = filepath.gsub(/.jsonnet\z/, '.yml')
+    File.write(new_path, YAML.dump(definition))
+    puts new_path
+  end
+
   private
 
   def validate_path!(path)
