@@ -23,15 +23,23 @@ module Kumonos
 
       def to_h
         h = super
-        h[:routes] = routes.flat_map { |r| [r.to_h_with_retry, r.to_h] }
+        h[:routes] = routes.flat_map do |r|
+          # i.e. retry with gRPC request (HTTP POST)
+          if r.method
+            [r.to_h_with_retry]
+          else
+            [r.to_h_with_retry, r.to_h]
+          end
+        end
         h
       end
     end
 
-    Route = Struct.new(:prefix, :cluster, :timeout_ms, :retry_policy, :host_header) do
+    Route = Struct.new(:prefix, :path, :method, :cluster, :timeout_ms, :retry_policy, :host_header) do
       class << self
         def build(h, cluster, host_header)
-          new(h.fetch('prefix'), cluster, h.fetch('timeout_ms'), RetryPolicy.build(h.fetch('retry_policy')), host_header)
+          new(h['prefix'], h['path'], h['method'], cluster, h.fetch('timeout_ms'),
+              RetryPolicy.build(h.fetch('retry_policy')), host_header)
         end
       end
 
@@ -39,6 +47,18 @@ module Kumonos
         h = super
         h.delete(:retry_policy)
         h.delete(:host_header)
+        h.delete(:method)
+
+        if prefix
+          h.delete(:path)
+          h[:prefix] = prefix
+        elsif path
+          h.delete(:prefix)
+          h[:path] = path
+        else
+          raise '`path` or `prefix` is required'
+        end
+
         if host_header
           h[:host_rewrite] = host_header
         else
@@ -47,10 +67,22 @@ module Kumonos
         h
       end
 
+      ALLOWED_METHODS = %w[GET HEAD POST PUT DELETE].freeze
       def to_h_with_retry
         h = to_h
         h[:retry_policy] = retry_policy.to_h
-        h[:headers] = [{ name: ':method', value: '(GET|HEAD)', regex: true }]
+
+        if method
+          m = method.upcase
+          unless ALLOWED_METHODS.include?(m)
+            raise "method must be one of #{ALLOWED_METHODS.join(',')}: given `#{m}`"
+          end
+
+          h[:headers] = [{ name: ':method', value: m, regex: false }]
+        else
+          h[:headers] = [{ name: ':method', value: '(GET|HEAD)', regex: true }]
+        end
+
         h
       end
     end

@@ -69,6 +69,24 @@ RSpec.describe Kumonos::Routes do
               timeout_ms: 3000,
               auto_host_rewrite: true,
               cluster: 'ab-testing-development'
+            },
+            {
+              path: '/grpc.health.v1.Health/Check',
+              timeout_ms: 3000,
+              auto_host_rewrite: true,
+              cluster: 'ab-testing-development',
+              retry_policy: {
+                retry_on: '5xx,connect-failure,refused-stream,cancelled,deadline-exceeded,resource-exhausted',
+                num_retries: 3,
+                per_try_timeout_ms: 700
+              },
+              headers: [
+                {
+                  name: ':method',
+                  value: 'POST',
+                  regex: false
+                }
+              ]
             }
           ]
         }

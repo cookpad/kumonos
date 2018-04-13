@@ -93,9 +93,8 @@
             "items": {
               "type": "object",
               "id": "/properties/dependencies/items/properties/routes/items",
-              "additionalProperties": false,
+              "additionalProperties": true,
               "required": [
-                "prefix",
                 "timeout_ms",
                 "retry_policy"
               ],
@@ -103,6 +102,16 @@
                 "prefix": {
                   "type": "string",
                   "id": "/properties/dependencies/items/properties/routes/items/properties/prefix",
+                  "default": "/"
+                },
+                "path": {
+                  "type": "string",
+                  "id": "/properties/dependencies/items/properties/routes/items/properties/path",
+                  "default": "/"
+                },
+                "method": {
+                  "type": "string",
+                  "id": "/properties/dependencies/items/properties/routes/items/properties/method",
                   "default": "/"
                 },
                 "timeout_ms": {
