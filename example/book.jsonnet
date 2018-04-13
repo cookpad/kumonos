@@ -21,7 +21,19 @@ local routes = import 'routes.libsonnet';
             tls: false,
             connect_timeout_ms: 250,
             circuit_breaker: circuit_breaker,
-            routes: [routes.root],
+            routes: [
+                routes.root,
+                {
+                    path: '/grpc.health.v1.Health/Check',
+                    method: 'POST',
+                    timeout_ms: 3000,
+                    retry_policy: {
+                        retry_on: '5xx,connect-failure,refused-stream,cancelled,deadline-exceeded,resource-exhausted',
+                        num_retries: 3,
+                        per_try_timeout_ms: 700,
+                    },
+                },
+            ],
         },
     ],
 }
