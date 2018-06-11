@@ -9,7 +9,7 @@ module Kumonos
       end
     end
 
-    Cluster = Struct.new(:name, :connect_timeout_ms, :lb, :tls, :circuit_breaker, :use_sds) do
+    Cluster = Struct.new(:name, :connect_timeout_ms, :lb, :tls, :circuit_breaker, :outlier_detection, :use_sds) do
       class << self
         def build(h)
           use_sds = h.fetch('sds', false)
@@ -21,6 +21,7 @@ module Kumonos
             lb,
             h.fetch('tls'),
             CircuitBreaker.build(h.fetch('circuit_breaker')),
+            OutlierDetection.build(h['outlier_detection']), # optional
             use_sds
           )
         end
@@ -47,6 +48,12 @@ module Kumonos
         h.delete(:circuit_breaker)
         h[:circuit_breakers] = { default: circuit_breaker.to_h }
 
+        if outlier_detection
+          h[:outlier_detection] = outlier_detection.to_h
+        else
+          h.delete(:outlier_detection)
+        end
+
         h
       end
     end
@@ -55,6 +62,19 @@ module Kumonos
       class << self
         def build(h)
           new(h.fetch('max_connections'), h.fetch('max_pending_requests'), h.fetch('max_retries'))
+        end
+      end
+    end
+
+    OutlierDetection = Struct.new(:consecutive_5xx) do
+      class << self
+        def build(h)
+          return nil unless h
+          new(h['consecutive_5xx'])
+        end
+
+        def to_h
+          super.delete_if(&:nil?)
         end
       end
     end
