@@ -87,6 +87,11 @@
               }
             }
           },
+          "outlier_detection": {
+            "type": "object",
+            "id": "/properties/dependencies/items/properties/outlier_detection",
+            "additionalProperties": true
+          },
           "routes": {
             "type": "array",
             "id": "/properties/dependencies/items/properties/routes",
