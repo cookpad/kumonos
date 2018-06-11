@@ -9,7 +9,7 @@ module Kumonos
       end
     end
 
-    Cluster = Struct.new(:name, :connect_timeout_ms, :lb, :tls, :circuit_breaker, :use_sds) do
+    Cluster = Struct.new(:name, :connect_timeout_ms, :lb, :tls, :circuit_breaker, :outlier_detection, :use_sds) do
       class << self
         def build(h)
           use_sds = h.fetch('sds', false)
@@ -21,6 +21,7 @@ module Kumonos
             lb,
             h.fetch('tls'),
             CircuitBreaker.build(h.fetch('circuit_breaker')),
+            OutlierDetection.build(h['outlier_detection']), # optional
             use_sds
           )
         end
@@ -47,6 +48,12 @@ module Kumonos
         h.delete(:circuit_breaker)
         h[:circuit_breakers] = { default: circuit_breaker.to_h }
 
+        if outlier_detection
+          h[:outlier_detection] = outlier_detection.to_h
+        else
+          h.delete(:outlier_detection)
+        end
+
         h
       end
     end
@@ -56,6 +63,31 @@ module Kumonos
         def build(h)
           new(h.fetch('max_connections'), h.fetch('max_pending_requests'), h.fetch('max_retries'))
         end
+      end
+    end
+
+    OutlierDetection = Struct.new(:consecutive_5xx, :consecutive_gateway_failure, :interval_ms, :base_ejection_time_ms, :max_ejection_percent,
+                                  :enforcing_consecutive_5xx, :enforcing_consecutive_gateway_failure, :enforcing_success_rate,
+                                  :success_rate_minimum_hosts, :success_rate_request_volume, :success_rate_stdev_factor,
+                                  keyword_init: true) do
+      class << self
+        def build(h)
+          return nil unless h
+
+          args = {}
+          %w[consecutive_5xx consecutive_gateway_failure interval_ms base_ejection_time_ms max_ejection_percent
+             enforcing_consecutive_5xx enforcing_consecutive_gateway_failure enforcing_success_rate
+             success_rate_minimum_hosts success_rate_request_volume success_rate_stdev_factor].each do |e|
+            args[e.to_sym] = h.delete(e)
+          end
+          raise "Fields are not allowed: #{h.keys}" unless h.keys.empty?
+
+          new(**args)
+        end
+      end
+
+      def to_h
+        super.delete_if { |_, v| v.nil? }
       end
     end
   end

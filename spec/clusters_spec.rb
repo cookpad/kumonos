@@ -35,6 +35,9 @@ RSpec.describe Kumonos::Clusters do
               max_pending_requests: 128,
               max_retries: 3
             }
+          },
+          outlier_detection: {
+            consecutive_5xx: 3
           }
         }
       ]

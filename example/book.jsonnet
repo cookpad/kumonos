@@ -21,6 +21,9 @@ local routes = import 'routes.libsonnet';
             tls: false,
             connect_timeout_ms: 250,
             circuit_breaker: circuit_breaker,
+            outlier_detection: {
+              consecutive_5xx: 3,
+            },
             routes: [
                 routes.root,
                 {

@@ -2,6 +2,7 @@ require 'bundler/setup'
 require 'pry'
 require 'kumonos'
 
+require 'jsonnet'
 require 'rspec/json_matcher'
 
 RSpec.configure do |config|
