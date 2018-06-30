@@ -1,5 +1,5 @@
 # Kumonos
-[![Build Status](https://travis-ci.org/taiki45/kumonos.svg?branch=master)](https://travis-ci.org/taiki45/kumonos)
+[![Build Status](https://travis-ci.org/cookpad/kumonos.svg?branch=master)](https://travis-ci.org/cookpad/kumonos)
 [![Gem Version](https://badge.fury.io/rb/kumonos.svg)](https://badge.fury.io/rb/kumonos)
 
 A "control plane" for Microservices "service mesh".
