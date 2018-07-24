@@ -184,6 +184,8 @@ module Kumonos
         end
       end
 
+      ONE_SECONDS_IN_NANOS = 1_000_000_000
+      ONE_MSEC_IN_NANOS = 1_000_000
       def to_h
         h = super
         h[:type] = type.upcase
@@ -191,10 +193,14 @@ module Kumonos
         h[:lb_policy] = lb_type.upcase
         h.delete(:tls)
         h[:tls_context] = {} if tls
+
+        sec, nanos = (connect_timeout_ms * ONE_MSEC_IN_NANOS).divmod(ONE_SECONDS_IN_NANOS)
         h.delete(:connect_timeout_ms)
         h[:connect_timeout] = {
-          seconds: connect_timeout_ms / 1000.0
+          seconds: sec,
+          nanos: nanos
         }
+
         # Just work-around, it could be configurable.
         h[:dns_lookup_family] = 'V4_ONLY'
         h

@@ -86,7 +86,8 @@ RSpec.describe Kumonos::Envoy do
           {
             name: 'nginx',
             connect_timeout: {
-              seconds: 1
+              seconds: 0,
+              nanos: 100_000_000
             },
             type: 'STRICT_DNS',
             dns_lookup_family: 'V4_ONLY',
@@ -98,7 +99,8 @@ RSpec.describe Kumonos::Envoy do
           {
             name: 'sds',
             connect_timeout: {
-              seconds: 1
+              seconds: 1,
+              nanos: 500_000_000
             },
             type: 'STRICT_DNS',
             dns_lookup_family: 'V4_ONLY',
@@ -140,7 +142,8 @@ RSpec.describe Kumonos::Envoy do
       dns_lookup_family: 'V4_ONLY',
       tls_context: {},
       connect_timeout: {
-        seconds: 1.0
+        seconds: 0,
+        nanos: 100_000_000
       },
       lb_policy: 'ROUND_ROBIN',
       hosts: [
