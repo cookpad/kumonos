@@ -14,6 +14,9 @@ module Kumonos
         def build(h)
           use_sds = h.fetch('sds', false)
           lb = use_sds ? nil : h.fetch('lb')
+          if lb && lb.split(':').size != 2
+            raise "Invalid format in `lb` value. Must be \"${host}:${port}\" format: #{lb}"
+          end
 
           new(
             h.fetch('cluster_name'),
