@@ -71,4 +71,17 @@ RSpec.describe Kumonos::Clusters do
       ]
     )
   end
+
+  describe 'validation' do
+    let(:invalid_definition) do
+      filename = File.expand_path('../example/book.jsonnet', __dir__)
+      d = Jsonnet.load(filename)
+      d.fetch('dependencies')[0]['lb'] = 'user-app'
+      d
+    end
+
+    specify '.generate raises an error' do
+      expect { Kumonos::Clusters.generate(invalid_definition) }.to raise_error(/Invalid format in `lb` value/)
+    end
+  end
 end
