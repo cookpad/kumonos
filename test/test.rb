@@ -43,6 +43,23 @@ catch(:break) do
   i = 0
   loop do
     begin
+      Net::HTTP.start(sds_url.host, sds_url.port) do |http|
+        http.get('/v1/registration/dummy')
+        throw(:break)
+      end
+    rescue EOFError, SystemCallError
+      raise('Can not run the app container') if i == 19 # Overall retries end within 3.8s.
+      puts 'waiting the app container to run...'
+      sleep((2 * i) / 100.0)
+      i += 1
+    end
+  end
+end
+
+catch(:break) do
+  i = 0
+  loop do
+    begin
       Net::HTTP.start(envoy_url.host, envoy_url.port) do |http|
         response = http.get('/')
         throw(:break) if response.code == '404'
