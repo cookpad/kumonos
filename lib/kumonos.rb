@@ -12,5 +12,5 @@ require 'kumonos/output'
 
 # Kumonos
 module Kumonos
-  DEFAULT_ROUTE_NAME = 'default'
+  DEFAULT_ROUTE_NAME = 'default'.freeze
 end
