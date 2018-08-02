@@ -8,7 +8,7 @@ if level.nil?
 end
 
 path = 'lib/kumonos/version.rb'
-regexp = /VERSION = '(.+)'.freeze$/
+regexp = /VERSION = '(.+)'$/
 version = File.read(path).scan(regexp)[0][0]
 version_strs = version.split('.')
 
@@ -33,6 +33,6 @@ else
 end
 
 next_version = version_strs.join('.')
-File.write(path, File.read(path).gsub(regexp, "VERSION = '#{next_version}'.freeze"))
+File.write(path, File.read(path).gsub(regexp, "VERSION = '#{next_version}'"))
 system('git', 'add', path)
 system('git', 'commit', '-m', "v#{next_version}")
