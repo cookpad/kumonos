@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 require 'jsonnet'
 
 RSpec.describe Kumonos::Routes do

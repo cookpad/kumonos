@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 module Kumonos
   # Generate clusters configuration.
   module Clusters
@@ -71,21 +73,20 @@ module Kumonos
 
     OutlierDetection = Struct.new(:consecutive_5xx, :consecutive_gateway_failure, :interval_ms, :base_ejection_time_ms, :max_ejection_percent,
                                   :enforcing_consecutive_5xx, :enforcing_consecutive_gateway_failure, :enforcing_success_rate,
-                                  :success_rate_minimum_hosts, :success_rate_request_volume, :success_rate_stdev_factor,
-                                  keyword_init: true) do
+                                  :success_rate_minimum_hosts, :success_rate_request_volume, :success_rate_stdev_factor) do
       class << self
         def build(h)
           return nil unless h
 
-          args = {}
+          args = []
           %w[consecutive_5xx consecutive_gateway_failure interval_ms base_ejection_time_ms max_ejection_percent
              enforcing_consecutive_5xx enforcing_consecutive_gateway_failure enforcing_success_rate
              success_rate_minimum_hosts success_rate_request_volume success_rate_stdev_factor].each do |e|
-            args[e.to_sym] = h.delete(e)
+            args << h.delete(e)
           end
           raise "Fields are not allowed: #{h.keys}" unless h.keys.empty?
 
-          new(**args)
+          new(*args)
         end
       end
 

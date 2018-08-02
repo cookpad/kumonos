@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 module Kumonos
   # Generate routes configuration
   module Routes

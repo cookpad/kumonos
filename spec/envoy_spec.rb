@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 RSpec.describe Kumonos::Envoy do
   let(:definition) do
     YAML.load_file(File.expand_path('../example/envoy_config.yml', __dir__))
