@@ -4,6 +4,7 @@ AllCops:
   Exclude:
     - 'test/grpc/lib/health_pb.rb'
     - 'test/grpc/lib/health_services_pb.rb'
+  TargetRubyVersion: 2.3
 
 Metrics/BlockLength:
   Enabled: false
