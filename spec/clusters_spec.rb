@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 RSpec.describe Kumonos::Clusters do
   let(:definition) do
     filename = File.expand_path('../example/book.jsonnet', __dir__)

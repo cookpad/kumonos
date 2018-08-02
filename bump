@@ -1,4 +1,6 @@
 #!/usr/bin/env ruby
+# frozen_string_literal: true
+
 level = ARGV.first
 if level.nil?
   warn "Example: #{__FILE__} (tiny|minor|major)"

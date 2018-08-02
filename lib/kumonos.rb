@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 require 'json'
 require 'yaml'
 
@@ -10,5 +12,5 @@ require 'kumonos/output'
 
 # Kumonos
 module Kumonos
-  DEFAULT_ROUTE_NAME = 'default'.freeze
+  DEFAULT_ROUTE_NAME = 'default'
 end
