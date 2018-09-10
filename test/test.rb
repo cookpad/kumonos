@@ -34,6 +34,7 @@ catch(:break) do
       end
     rescue EOFError, SystemCallError
       raise('Can not run the app container') if i == 19 # Overall retries end within 3.8s.
+
       puts 'waiting the app container to run...'
       sleep((2 * i) / 100.0)
       i += 1
@@ -51,6 +52,7 @@ catch(:break) do
       end
     rescue EOFError, SystemCallError
       raise('Can not run the app container') if i == 19 # Overall retries end within 3.8s.
+
       puts 'waiting the app container to run...'
       sleep((2 * i) / 100.0)
       i += 1
@@ -68,6 +70,7 @@ catch(:break) do
       end
     rescue EOFError, SystemCallError
       raise('Can not run the envoy container') if i == 19 # Overall retries end within 3.8s.
+
       puts 'waiting the envoy container to run...'
       sleep((2 * i) / 100.0)
       i += 1
@@ -109,6 +112,7 @@ Net::HTTP.start(envoy_url.host, envoy_url.port) do |http|
       end
 
       raise('Can not fetch healty upstreams') if i > 30
+
       puts 'waiting the envoy to fetch from SDS...'
       sleep((2 * i) / 100.0)
       i += 1

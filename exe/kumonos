@@ -98,12 +98,14 @@ class KumonosCli < Thor
   def validate_envoy_definition!(h, path)
     result = Kumonos::Schemas.validate_envoy_definition(h)
     return if result.empty?
+
     warn_and_exit(result, path, Kumonos::Schemas::ENVOY_SCHEMA_PATH)
   end
 
   def validate_service_definition!(h, path)
     result = Kumonos::Schemas.validate_service_definition(h)
     return if result.empty?
+
     warn_and_exit(result, path, Kumonos::Schemas::SERVIVE_DEFINITION_PATH)
   end
 
