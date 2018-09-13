@@ -32,6 +32,19 @@
         "access_log_path": {
           "type": "string",
           "id": "/properties/listener/properties/access_log_path"
+        },
+        "additional_http_filters": {
+          "type": "array",
+          "id": "/properties/listener/properties/additional_http_filters",
+          "additionalProperties": true,
+          "items": {
+            "type": "object",
+            "additionalProperties": true,
+            "required": [
+              "name",
+              "config"
+            ]
+          }
         }
       }
     },
@@ -125,6 +138,11 @@
           "id": "/properties/statsd/properties/address"
         }
       }
+    },
+    "runtime": {
+      "type": "object",
+      "id": "/properties/runtime",
+      "additionalProperties": true
     }
   }
 }

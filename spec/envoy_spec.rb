@@ -160,4 +160,25 @@ RSpec.describe Kumonos::Envoy do
     expect(out).not_to have_key(:stats_sinks)
     expect(out).not_to have_key(:stats_config)
   end
+
+  specify '.generate with fault injection' do
+    runtime_configuration = {
+      symlink_root: '/srv/runtime/current',
+      subdirectory: 'envoy',
+      override_subdirectory: 'envoy_override'
+    }
+    definition['runtime'] = runtime_configuration
+
+    additional_http_filters_configuration = [
+      { name: 'envoy.fault' }
+    ]
+    definition['listener']['additional_http_filters'] = additional_http_filters_configuration
+
+    out = Kumonos::Envoy.generate(definition, cluster: cluster, node: node)
+    runtime = out.fetch(:runtime)
+    http_filters = out.fetch(:static_resources).fetch(:listeners)[0].fetch(:filter_chains)[0].fetch(:filters)[0].fetch(:config).fetch(:http_filters)
+
+    expect(JSON.dump(runtime)).to be_json_as(runtime_configuration)
+    expect(JSON.dump(http_filters)).to be_json_as(additional_http_filters_configuration + Kumonos::Envoy::DEFAULT_HTTP_FILTERS)
+  end
 end

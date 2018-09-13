@@ -3,13 +3,15 @@
 module Kumonos
   # Generate envoy configuration.
   module Envoy
+    DEFAULT_HTTP_FILTERS = [{ name: 'envoy.router' }].freeze
+
     class << self
       def generate(definition, cluster:, node:)
         EnvoyConfig.build(definition, cluster: cluster, node: node).to_h
       end
     end
 
-    EnvoyConfig = Struct.new(:version, :discovery_service, :statsd, :listener, :admin, :cluster, :node, :sds) do
+    EnvoyConfig = Struct.new(:version, :discovery_service, :statsd, :listener, :admin, :cluster, :node, :sds, :runtime) do
       class << self
         def build(h, cluster:, node:)
           discovery_service = DiscoverService.build(h.fetch('discovery_service'))
@@ -22,7 +24,8 @@ module Kumonos
             Admin.build(h.fetch('admin')),
             cluster,
             node,
-            sds
+            sds,
+            h['runtime']
           )
         end
 
@@ -49,7 +52,9 @@ module Kumonos
         h.delete(:listener)
         h.delete(:cluster)
         h.delete(:node)
+        h.delete(:runtime)
         h[:admin] = admin.to_h
+        h[:runtime] = runtime.to_h if runtime
         h[:static_resources] = {
           listeners: [listener.to_h],
           clusters: [discovery_service.cluster.to_h, sds.cluster.to_h]
@@ -104,11 +109,11 @@ module Kumonos
       end
     end
 
-    Listener = Struct.new(:address, :access_log_path, :discovery_service) do
+    Listener = Struct.new(:address, :access_log_path, :discovery_service, :additional_http_filters) do
       class << self
         def build(h, discovery_service)
           address = AddressParser.call(h.fetch('address'))
-          new(address, h.fetch('access_log_path'), discovery_service)
+          new(address, h.fetch('access_log_path'), discovery_service, h['additional_http_filters'])
         end
       end
 
@@ -116,6 +121,10 @@ module Kumonos
         h = super
         h.delete(:discovery_service)
         h.delete(:access_log_path)
+        h.delete(:additional_http_filters)
+
+        http_filters = (additional_http_filters || []) + DEFAULT_HTTP_FILTERS
+
         h[:name] = 'egress'
         h[:filter_chains] = [
           {
@@ -144,7 +153,7 @@ module Kumonos
                     },
                     route_config_name: DEFAULT_ROUTE_NAME
                   },
-                  http_filters: [{ name: 'envoy.router' }]
+                  http_filters: http_filters
                 }
               }
             ]
