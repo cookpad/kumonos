@@ -48,7 +48,10 @@ module Kumonos
 
         h[:lb_type] = 'round_robin'
         h.delete(:tls)
-        h[:ssl_context] = {} if tls
+        if tls
+          h[:ssl_context] = {}
+          h[:ssl_context][:sni] = lb.split(':', 2)[0] unless use_sds
+        end
 
         h.delete(:circuit_breaker)
         h[:circuit_breakers] = { default: circuit_breaker.to_h }

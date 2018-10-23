@@ -60,7 +60,9 @@ RSpec.describe Kumonos::Clusters do
           connect_timeout_ms: 250,
           type: 'strict_dns',
           lb_type: 'round_robin',
-          ssl_context: {},
+          ssl_context: {
+            sni: 'example.com'
+          },
           hosts: [{ url: 'tcp://example.com:443' }],
           circuit_breakers: {
             default: {
