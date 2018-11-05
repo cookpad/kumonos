@@ -76,9 +76,7 @@ module Kumonos
 
         if method
           m = method.upcase
-          unless ALLOWED_METHODS.include?(m)
-            raise "method must be one of #{ALLOWED_METHODS.join(',')}: given `#{m}`"
-          end
+          raise "method must be one of #{ALLOWED_METHODS.join(',')}: given `#{m}`" unless ALLOWED_METHODS.include?(m)
 
           h[:headers] = [{ name: ':method', value: m, regex: false }]
         else
