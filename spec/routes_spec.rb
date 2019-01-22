@@ -19,6 +19,12 @@ RSpec.describe Kumonos::Routes do
           domains: ['user'],
           routes: [
             {
+              path: '/ping',
+              timeout_ms: 100,
+              host_rewrite: 'user-service',
+              cluster: 'user-development'
+            },
+            {
               prefix: '/',
               timeout_ms: 3000,
               host_rewrite: 'user-service',

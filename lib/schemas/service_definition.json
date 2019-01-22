@@ -26,7 +26,6 @@
           "cluster_name",
           "tls",
           "connect_timeout_ms",
-          "circuit_breaker",
           "routes"
         ],
         "properties": {
@@ -100,8 +99,7 @@
               "id": "/properties/dependencies/items/properties/routes/items",
               "additionalProperties": true,
               "required": [
-                "timeout_ms",
-                "retry_policy"
+                "timeout_ms"
               ],
               "properties": {
                 "prefix": {
