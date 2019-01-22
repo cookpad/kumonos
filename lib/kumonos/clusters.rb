@@ -18,12 +18,19 @@ module Kumonos
           lb = use_sds ? nil : h.fetch('lb')
           raise "Invalid format in `lb` value. Must be \"${host}:${port}\" format: #{lb}" if lb && lb.split(':').size != 2
 
+          circuit_breaker =
+            if h.key?('circuit_breaker')
+              CircuitBreaker.build(h.fetch('circuit_breaker'))
+            else
+              nil
+            end
+
           new(
             h.fetch('cluster_name'),
             h.fetch('connect_timeout_ms'),
             lb,
             h.fetch('tls'),
-            CircuitBreaker.build(h.fetch('circuit_breaker')),
+            circuit_breaker,
             OutlierDetection.build(h['outlier_detection']), # optional
             use_sds
           )
@@ -52,7 +59,7 @@ module Kumonos
         end
 
         h.delete(:circuit_breaker)
-        h[:circuit_breakers] = { default: circuit_breaker.to_h }
+        h[:circuit_breakers] = { default: circuit_breaker.to_h } if circuit_breaker
 
         if outlier_detection
           h[:outlier_detection] = outlier_detection.to_h

@@ -26,8 +26,10 @@ module Kumonos
       def to_h
         h = super
         h[:routes] = routes.flat_map do |r|
+          if r.retry_policy.nil?
+            [r.to_h]
           # i.e. retry with gRPC request (HTTP POST)
-          if r.method
+          elsif r.method
             [r.to_h_with_retry]
           else
             [r.to_h_with_retry, r.to_h]
@@ -40,8 +42,15 @@ module Kumonos
     Route = Struct.new(:prefix, :path, :method, :cluster, :timeout_ms, :retry_policy, :host_header) do
       class << self
         def build(h, cluster, host_header)
+          retry_policy =
+            if h.key?('retry_policy')
+              RetryPolicy.build(h.fetch('retry_policy'))
+            else
+              nil
+            end
+
           new(h['prefix'], h['path'], h['method'], cluster, h.fetch('timeout_ms'),
-              RetryPolicy.build(h.fetch('retry_policy')), host_header)
+              retry_policy, host_header)
         end
       end
 
@@ -72,7 +81,7 @@ module Kumonos
       ALLOWED_METHODS = %w[GET HEAD POST PUT DELETE].freeze
       def to_h_with_retry
         h = to_h
-        h[:retry_policy] = retry_policy.to_h
+        h[:retry_policy] = retry_policy.to_h if retry_policy
 
         if method
           m = method.upcase
