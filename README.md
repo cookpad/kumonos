@@ -1,3 +1,7 @@
+**Not active. We've moved to https://github.com/cookpad/itacho.**
+
+---
+
 # Kumonos
 [![Build Status](https://travis-ci.org/cookpad/kumonos.svg?branch=master)](https://travis-ci.org/cookpad/kumonos)
 [![Gem Version](https://badge.fury.io/rb/kumonos.svg)](https://badge.fury.io/rb/kumonos)
@@ -8,9 +12,6 @@ A "control plane" for Microservices "service mesh".
 ```
 gem install kumonos
 ```
-
-## Usage
-TODO
 
 ## Contributing
 Bug reports and pull requests are welcome on GitHub at https://github.com/cookpad/kumonos.
